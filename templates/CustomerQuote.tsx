@@ -10,7 +10,7 @@ export default function CustomerQuote({ variant }: Props) {
       <div className="cq-logo"><AugmentLogo /></div>
       <div className="cq-content">
         <div className="cq-quote">
-          <span className="cq-quote-mark">"</span>{variant.headline}
+          <span className="cq-quote-mark">&ldquo;</span>{variant.headline}
         </div>
       </div>
       {variant.cta && (
