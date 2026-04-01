@@ -1,66 +1,81 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client'
+import { useState } from 'react'
+import type { Variant, Platform } from '@/lib/types'
+import PromptInput from '@/components/PromptInput'
+import VariantGrid from '@/components/VariantGrid'
+import ExportModal from '@/components/ExportModal'
+import './page.css'
 
-export default function Home() {
+interface ExportTarget {
+  element: HTMLElement
+  variant: Variant
+}
+
+export default function BuilderPage() {
+  const [variants, setVariants] = useState<Variant[]>([])
+  const [platforms, setPlatforms] = useState<Platform[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [exportTarget, setExportTarget] = useState<ExportTarget | null>(null)
+
+  async function handleGenerate(prompt: string, selectedPlatforms: Platform[]) {
+    setLoading(true)
+    setError(null)
+    setPlatforms(selectedPlatforms)
+
+    try {
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, platforms: selectedPlatforms })
+      })
+
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error ?? 'Generation failed')
+      }
+
+      const data = await res.json()
+      setVariants(data.variants)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main className="builder">
+      <div className="builder-header">
+        <div className="builder-title">Augment Ad Builder</div>
+        <div className="builder-subtitle">Describe your ad. Get 5 variants.</div>
+      </div>
+
+      <PromptInput onGenerate={handleGenerate} loading={loading} />
+
+      {error && (
+        <div style={{ color: '#ff6b6b', fontFamily: 'var(--font-mono)', fontSize: 12, textAlign: 'center' }}>
+          {error}
+        </div>
+      )}
+
+      <div className="builder-variants">
+        <VariantGrid
+          variants={variants}
+          platforms={platforms}
+          loading={loading}
+          onExport={(el, v) => setExportTarget({ element: el, variant: v })}
         />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+      </div>
+
+      {exportTarget && (
+        <ExportModal
+          variant={exportTarget.variant}
+          element={exportTarget.element}
+          platforms={platforms}
+          onClose={() => setExportTarget(null)}
+        />
+      )}
+    </main>
+  )
 }
