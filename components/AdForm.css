@@ -10,7 +10,7 @@
 .ad-type-toggle {
   display: flex;
   gap: 0;
-  border: 1px solid #2a2a35;
+  border: 1px solid var(--border);
   border-radius: 3px;
   overflow: hidden;
   align-self: flex-start;
@@ -20,7 +20,7 @@
   padding: 8px 20px;
   background: transparent;
   border: none;
-  color: #555;
+  color: var(--text-muted);
   font-family: var(--font-mono);
   font-size: 11px;
   text-transform: uppercase;
@@ -29,8 +29,8 @@
   transition: background 0.15s, color 0.15s;
 }
 .ad-type-btn.active {
-  background: #1AA049;
-  color: #000;
+  background: var(--accent);
+  color: var(--accent-text);
   font-weight: 600;
 }
 
@@ -54,23 +54,26 @@
 
 .field-label {
   font-family: var(--font-mono);
-  font-size: 10px;
-  color: #555;
+  font-size: 11px;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
 
 .field-label span {
-  color: #333;
+  color: var(--text-hint);
   margin-left: 4px;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 10px;
 }
 
 .field-input,
 .field-textarea {
-  background: #111114;
-  border: 1px solid #2a2a35;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 3px;
-  color: #f5f5f7;
+  color: var(--text-primary);
   font-family: var(--font-sans);
   font-size: 14px;
   font-weight: 300;
@@ -80,9 +83,9 @@
   width: 100%;
 }
 .field-input:focus,
-.field-textarea:focus { border-color: #1AA049; }
+.field-textarea:focus { border-color: var(--accent); }
 .field-input::placeholder,
-.field-textarea::placeholder { color: #333; }
+.field-textarea::placeholder { color: var(--text-placeholder); }
 
 .field-textarea {
   resize: vertical;
@@ -91,12 +94,12 @@
 
 .form-divider {
   height: 1px;
-  background: #1a1a22;
+  background: var(--border-subtle);
 }
 
 .platforms-label {
-  font-size: 10px;
-  color: #555;
+  font-size: 11px;
+  color: var(--text-secondary);
   font-family: var(--font-mono);
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -111,22 +114,22 @@
 
 .platform-chip {
   padding: 6px 12px;
-  border: 1px solid #2a2a35;
+  border: 1px solid var(--border);
   border-radius: 2px;
   background: transparent;
-  color: #555;
+  color: var(--text-muted);
   font-family: var(--font-mono);
   font-size: 11px;
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s;
 }
-.platform-chip:hover { border-color: #444; color: #888; }
-.platform-chip.selected { border-color: #1AA049; color: #1AA049; }
+.platform-chip:hover { border-color: var(--text-muted); color: var(--text-secondary); }
+.platform-chip.selected { border-color: var(--accent); color: var(--accent); }
 
 .generate-btn {
   align-self: flex-start;
-  background: #1AA049;
-  color: #000;
+  background: var(--accent);
+  color: var(--accent-text);
   border: none;
   border-radius: 2px;
   font-family: var(--font-sans);

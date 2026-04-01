@@ -9,8 +9,8 @@
 }
 
 .export-modal {
-  background: #111114;
-  border: 1px solid #2a2a35;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 4px;
   padding: 24px;
   min-width: 300px;
@@ -22,14 +22,14 @@
 
 .export-modal-title {
   font-size: 13px;
-  color: #f5f5f7;
+  color: var(--text-primary);
   font-weight: 500;
   letter-spacing: 0.02em;
 }
 
 .export-modal-subtitle {
   font-size: 11px;
-  color: #555;
+  color: var(--text-muted);
   font-family: var(--font-mono);
   margin-top: 2px;
 }
@@ -45,26 +45,26 @@
   align-items: center;
   justify-content: space-between;
   padding: 10px 14px;
-  border: 1px solid #1e1e26;
+  border: 1px solid var(--border-subtle);
   border-radius: 2px;
   background: transparent;
   cursor: pointer;
   transition: border-color 0.15s;
   text-align: left;
 }
-.export-platform-btn:hover { border-color: #1AA049; }
+.export-platform-btn:hover { border-color: var(--accent); }
 .export-platform-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .export-platform-name {
   font-family: var(--font-mono);
   font-size: 11px;
-  color: #f5f5f7;
+  color: var(--text-primary);
 }
 
 .export-platform-size {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: #444;
+  color: var(--text-muted);
 }
 
 .export-modal-footer {
@@ -74,8 +74,8 @@
 
 .export-modal-close {
   background: transparent;
-  border: 1px solid #2a2a35;
-  color: #555;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
   font-family: var(--font-mono);
   font-size: 10px;
   padding: 5px 12px;
@@ -83,4 +83,4 @@
   border-radius: 2px;
   transition: color 0.15s;
 }
-.export-modal-close:hover { color: #f5f5f7; }
+.export-modal-close:hover { color: var(--text-primary); }

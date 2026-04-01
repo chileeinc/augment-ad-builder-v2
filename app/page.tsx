@@ -4,6 +4,7 @@ import type { Variant, AdInput, Platform } from '@/lib/types'
 import AdForm from '@/components/AdForm'
 import VariantGrid from '@/components/VariantGrid'
 import ExportModal from '@/components/ExportModal'
+import ThemeToggle from '@/components/ThemeToggle'
 import './page.css'
 
 interface ExportTarget {
@@ -47,8 +48,11 @@ export default function BuilderPage() {
   return (
     <main className="builder">
       <div className="builder-header">
-        <div className="builder-title">Augment Ad Builder</div>
-        <div className="builder-subtitle">Add your copy. Get 5 design variants.</div>
+        <div className="builder-header-text">
+          <div className="builder-title">Augment Ad Builder</div>
+          <div className="builder-subtitle">Add your copy. Get 5 design variants.</div>
+        </div>
+        <ThemeToggle />
       </div>
 
       <AdForm onGenerate={handleGenerate} loading={loading} />
