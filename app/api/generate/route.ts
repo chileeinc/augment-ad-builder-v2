@@ -2,69 +2,73 @@ import { generateObject } from 'ai'
 import { anthropic } from '@ai-sdk/anthropic'
 import { z } from 'zod'
 import { NextResponse } from 'next/server'
+import { readFileSync } from 'fs'
+import { join } from 'path'
+import { LAYOUTS, THEMES, BACKGROUNDS } from '@/lib/types'
 import type { GenerateRequest } from '@/lib/types'
 
-const VariantSchema = z.object({
+const VisualTreatmentSchema = z.object({
   id: z.string(),
-  layout: z.enum(['big-type-body', 'stat-hero', 'customer-quote']),
-  theme: z.enum(['dark', 'light', 'tonal']),
-  background: z.enum(['none', 'dot-grid', 'grid']),
-  copy_angle: z.enum(['metric-led', 'benefit', 'bold-claim', 'brand-awareness']),
-  headline: z.string().max(80),
-  cta: z.string().max(40).nullable(),
-  stat: z.string().nullable(),
-  stat_label: z.string().nullable(),
+  layout: z.enum(LAYOUTS),
+  theme: z.enum(THEMES),
+  background: z.enum(BACKGROUNDS),
   reasoning: z.string()
 })
 
 const ResponseSchema = z.object({
-  variants: z.array(VariantSchema)
+  variants: z.array(VisualTreatmentSchema)
 })
 
-const SYSTEM_PROMPT = `You are an expert ad designer for Augment Code, an AI coding assistant for developers.
+const SYSTEM_PROMPT = readFileSync(
+  join(process.cwd(), 'docs/generation-guidelines.md'),
+  'utf-8'
+)
 
-Generate exactly 5 ad variants based on the user's prompt. Each variant must be distinct.
+function buildUserMessage(req: GenerateRequest): string {
+  const { input, platforms } = req
+  const lines: string[] = [`Ad type: ${input.adType}`, `Platforms: ${platforms.join(', ')}`]
 
-Rules:
-- Cover at least 2 different themes across the 5 variants (dark, light, tonal)
-- Cover at least 2 different layouts across the 5 variants
-- Vary copy_angle across variants — do not repeat the same angle more than twice
-- Headlines: punchy, ≤8 words, no filler ("discover", "unlock", "revolutionize")
-- CTAs: short action phrase ≤5 words (e.g. "Try free →", "See benchmarks →", null if not needed)
-- stat/stat_label: only when the prompt contains a specific metric (e.g. "10% faster" → stat="10%", stat_label="faster dev speed")
-- stat is only meaningful with layout=stat-hero; use null for other layouts
-- reasoning: one sentence explaining why this combination fits
+  if (input.adType === 'big-headline') {
+    lines.push(`Headline: "${input.headline}"`)
+    if (input.body) lines.push(`Body: "${input.body}"`)
+    if (input.stat) lines.push(`Stat: ${input.stat} (${input.statLabel ?? ''})`)
+    if (input.cta) lines.push(`CTA: "${input.cta}"`)
+    if (input.context) lines.push(`Context: ${input.context}`)
+  } else {
+    lines.push(`Quote: "${input.quote}"`)
+    if (input.name) lines.push(`Name: ${input.name}`)
+    if (input.titleAndCompany) lines.push(`Title & Company: ${input.titleAndCompany}`)
+    if (input.cta) lines.push(`CTA: "${input.cta}"`)
+    if (input.context) lines.push(`Context: ${input.context}`)
+  }
 
-Augment Code brand voice: technical, confident, precise. Ground claims in developer experience. Avoid generic AI hype.
-
-Available layouts: big-type-body, stat-hero, customer-quote
-Available themes: dark, light, tonal
-Available backgrounds: none, dot-grid, grid
-Available copy_angles: metric-led, benefit, bold-claim, brand-awareness
-
-Assign ids: "v1" through "v5".`
+  return lines.join('\n')
+}
 
 export async function POST(req: Request) {
   try {
     const body: GenerateRequest = await req.json()
 
-    if (!body.prompt?.trim()) {
-      return NextResponse.json({ error: 'prompt is required' }, { status: 400 })
+    if (body.input.adType === 'big-headline' && !body.input.headline?.trim()) {
+      return NextResponse.json({ error: 'headline is required' }, { status: 400 })
+    }
+    if (body.input.adType === 'quote' && !body.input.quote?.trim()) {
+      return NextResponse.json({ error: 'quote is required' }, { status: 400 })
     }
     if (!body.platforms?.length) {
       return NextResponse.json({ error: 'at least one platform is required' }, { status: 400 })
     }
 
-    const userMessage = `Prompt: "${body.prompt}"\nTarget platforms: ${body.platforms.join(', ')}`
-
     const { object } = await generateObject({
       model: anthropic('claude-sonnet-4-6'),
       schema: ResponseSchema,
       system: SYSTEM_PROMPT,
-      prompt: userMessage
+      prompt: buildUserMessage(body)
     })
 
-    return NextResponse.json(object)
+    // Merge visual treatments with input copy
+    const variants = object.variants.map(v => ({ ...v, input: body.input }))
+    return NextResponse.json({ variants })
   } catch (err) {
     console.error('[/api/generate]', err)
     return NextResponse.json({ error: 'generation failed' }, { status: 500 })

@@ -1,34 +1,33 @@
 'use client'
-import { useState, useRef, useCallback } from 'react'
-import type { Variant, Platform } from '@/lib/types'
-import PromptInput from '@/components/PromptInput'
+import { useState } from 'react'
+import type { Variant, AdInput, Platform } from '@/lib/types'
+import AdForm from '@/components/AdForm'
 import VariantGrid from '@/components/VariantGrid'
-import PlatformExportBar from '@/components/PlatformExportBar'
+import ExportModal from '@/components/ExportModal'
 import './page.css'
+
+interface ExportTarget {
+  element: HTMLElement
+  variant: Variant
+}
 
 export default function BuilderPage() {
   const [variants, setVariants] = useState<Variant[]>([])
   const [platforms, setPlatforms] = useState<Platform[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const adRefs = useRef<Map<string, HTMLDivElement>>(new Map())
+  const [exportTarget, setExportTarget] = useState<ExportTarget | null>(null)
 
-  const registerRef = useCallback((id: string, el: HTMLDivElement | null) => {
-    if (el) adRefs.current.set(id, el)
-    else adRefs.current.delete(id)
-  }, [])
-
-  async function handleGenerate(prompt: string, selectedPlatforms: Platform[]) {
+  async function handleGenerate(input: AdInput, selectedPlatforms: Platform[]) {
     setLoading(true)
     setError(null)
     setPlatforms(selectedPlatforms)
-    adRefs.current.clear()
 
     try {
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, platforms: selectedPlatforms })
+        body: JSON.stringify({ input, platforms: selectedPlatforms })
       })
 
       if (!res.ok) {
@@ -49,10 +48,10 @@ export default function BuilderPage() {
     <main className="builder">
       <div className="builder-header">
         <div className="builder-title">Augment Ad Builder</div>
-        <div className="builder-subtitle">Describe your ad. Get 5 variants.</div>
+        <div className="builder-subtitle">Add your copy. Get 5 design variants.</div>
       </div>
 
-      <PromptInput onGenerate={handleGenerate} loading={loading} />
+      <AdForm onGenerate={handleGenerate} loading={loading} />
 
       {error && (
         <div style={{ color: '#ff6b6b', fontFamily: 'var(--font-mono)', fontSize: 12, textAlign: 'center' }}>
@@ -61,11 +60,20 @@ export default function BuilderPage() {
       )}
 
       <div className="builder-variants">
-        <VariantGrid variants={variants} loading={loading} registerRef={registerRef} />
+        <VariantGrid
+          variants={variants}
+          loading={loading}
+          onExport={(el, v) => setExportTarget({ element: el, variant: v })}
+        />
       </div>
 
-      {variants.length > 0 && (
-        <PlatformExportBar variants={variants} platforms={platforms} adRefs={adRefs.current} />
+      {exportTarget && (
+        <ExportModal
+          variant={exportTarget.variant}
+          element={exportTarget.element}
+          platforms={platforms}
+          onClose={() => setExportTarget(null)}
+        />
       )}
     </main>
   )

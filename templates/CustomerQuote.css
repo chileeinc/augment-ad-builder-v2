@@ -27,8 +27,12 @@
 }
 .cq-attribution {
   font-family: var(--font-mono);
-  font-size: min(2.8cqw, 5cqh); color: var(--ad-fg-muted);
-  margin-top: min(4cqw, 4cqh); line-height: 1.5;
+  font-size: min(2.4cqw, 4.2cqh);
+  color: var(--ad-fg-muted);
+  margin-top: min(3cqw, 3cqh);
+  line-height: 1.5;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 .cq-footer {
   padding-top: min(4cqw, 4cqh);

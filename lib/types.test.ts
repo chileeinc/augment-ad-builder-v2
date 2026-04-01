@@ -20,19 +20,42 @@ describe('PLATFORM_SIZES', () => {
 })
 
 describe('Variant shape', () => {
-  it('accepts a valid variant object', () => {
+  it('accepts a valid big-headline variant object', () => {
     const v: Variant = {
       id: 'v1',
       layout: 'stat-hero',
       theme: 'dark',
       background: 'dot-grid',
-      copy_angle: 'metric-led',
-      headline: '10% faster. Every dev.',
-      cta: 'Try free →',
-      stat: '10%',
-      stat_label: 'faster dev speed',
-      reasoning: 'Stat-led for LinkedIn feed impact'
+      reasoning: 'Stat-led for LinkedIn feed impact',
+      input: {
+        adType: 'big-headline',
+        headline: '10% faster. Every dev.',
+        body: null,
+        cta: 'Try free →',
+        stat: '10%',
+        statLabel: 'faster dev speed',
+        context: null
+      }
     }
     expect(v.id).toBe('v1')
+  })
+
+  it('accepts a valid quote variant object', () => {
+    const v: Variant = {
+      id: 'v2',
+      layout: 'customer-quote',
+      theme: 'tonal',
+      background: 'none',
+      reasoning: 'Social proof for awareness campaign',
+      input: {
+        adType: 'quote',
+        quote: 'Augment cut our review time in half.',
+        name: 'Sarah Chen',
+        titleAndCompany: 'Staff Engineer · Vercel',
+        cta: 'Read the story →',
+        context: null
+      }
+    }
+    expect(v.id).toBe('v2')
   })
 })

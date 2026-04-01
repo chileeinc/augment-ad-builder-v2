@@ -16,23 +16,31 @@ const mockVariants = Array.from({ length: 5 }, (_, i) => ({
   layout: 'big-type-body',
   theme: 'dark',
   background: 'none',
-  copy_angle: 'benefit',
-  headline: `Headline ${i + 1}`,
-  cta: 'Try free →',
-  stat: null,
-  stat_label: null,
   reasoning: 'test reasoning'
 }))
+
+const validBigHeadlineInput = {
+  adType: 'big-headline',
+  headline: 'Test headline',
+  body: null,
+  cta: null,
+  stat: null,
+  statLabel: null,
+  context: null
+}
 
 describe('POST /api/generate', () => {
   beforeEach(() => {
     vi.mocked(generateObject).mockResolvedValue({ object: { variants: mockVariants } } as never)
   })
 
-  it('returns 400 when prompt is missing', async () => {
+  it('returns 400 when headline is missing', async () => {
     const req = new Request('http://localhost/api/generate', {
       method: 'POST',
-      body: JSON.stringify({ platforms: ['linkedin'] })
+      body: JSON.stringify({
+        input: { adType: 'big-headline', headline: '', body: null, cta: null, stat: null, statLabel: null, context: null },
+        platforms: ['linkedin']
+      })
     })
     const res = await POST(req)
     expect(res.status).toBe(400)
@@ -41,7 +49,7 @@ describe('POST /api/generate', () => {
   it('returns 400 when platforms is empty', async () => {
     const req = new Request('http://localhost/api/generate', {
       method: 'POST',
-      body: JSON.stringify({ prompt: 'test', platforms: [] })
+      body: JSON.stringify({ input: validBigHeadlineInput, platforms: [] })
     })
     const res = await POST(req)
     expect(res.status).toBe(400)
@@ -50,7 +58,7 @@ describe('POST /api/generate', () => {
   it('returns 200 with 5 variants on valid input', async () => {
     const req = new Request('http://localhost/api/generate', {
       method: 'POST',
-      body: JSON.stringify({ prompt: 'Augment makes devs 10% faster', platforms: ['linkedin'] })
+      body: JSON.stringify({ input: validBigHeadlineInput, platforms: ['linkedin'] })
     })
     const res = await POST(req)
     expect(res.status).toBe(200)
@@ -61,7 +69,7 @@ describe('POST /api/generate', () => {
   it('each variant has required fields', async () => {
     const req = new Request('http://localhost/api/generate', {
       method: 'POST',
-      body: JSON.stringify({ prompt: 'test prompt', platforms: ['linkedin'] })
+      body: JSON.stringify({ input: validBigHeadlineInput, platforms: ['linkedin'] })
     })
     const res = await POST(req)
     const data = await res.json()
@@ -69,7 +77,30 @@ describe('POST /api/generate', () => {
       expect(v.id).toBeTruthy()
       expect(v.layout).toBeTruthy()
       expect(v.theme).toBeTruthy()
-      expect(v.headline).toBeTruthy()
     }
+  })
+
+  it('each variant includes the input copy', async () => {
+    const req = new Request('http://localhost/api/generate', {
+      method: 'POST',
+      body: JSON.stringify({ input: validBigHeadlineInput, platforms: ['linkedin'] })
+    })
+    const res = await POST(req)
+    const data = await res.json()
+    for (const v of data.variants) {
+      expect(v.input).toEqual(validBigHeadlineInput)
+    }
+  })
+
+  it('returns 400 when quote is missing for quote ad type', async () => {
+    const req = new Request('http://localhost/api/generate', {
+      method: 'POST',
+      body: JSON.stringify({
+        input: { adType: 'quote', quote: '', name: null, titleAndCompany: null, cta: null, context: null },
+        platforms: ['linkedin']
+      })
+    })
+    const res = await POST(req)
+    expect(res.status).toBe(400)
   })
 })

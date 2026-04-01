@@ -18,6 +18,14 @@
   color: var(--ad-fg);
   flex: 1; min-height: 0; overflow: hidden;
 }
+.btb-body {
+  font-size: min(3cqw, 5.5cqh);
+  font-weight: 300;
+  color: var(--ad-fg);
+  line-height: 1.5;
+  opacity: 0.7;
+  margin-top: min(2cqw, 2cqh);
+}
 .btb-footer {
   padding-top: min(4cqw, 4cqh);
   border-top: 1px solid var(--ad-border);

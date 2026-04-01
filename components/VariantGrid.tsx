@@ -6,10 +6,10 @@ import './VariantGrid.css'
 interface Props {
   variants: Variant[]
   loading: boolean
-  registerRef: (id: string, el: HTMLDivElement | null) => void
+  onExport: (element: HTMLElement, variant: Variant) => void
 }
 
-export default function VariantGrid({ variants, loading, registerRef }: Props) {
+export default function VariantGrid({ variants, loading, onExport }: Props) {
   if (loading) {
     return (
       <div className="variant-grid-skeleton">
@@ -29,7 +29,7 @@ export default function VariantGrid({ variants, loading, registerRef }: Props) {
   return (
     <div className="variant-grid">
       {variants.map(v => (
-        <VariantCard key={v.id} variant={v} registerRef={registerRef} />
+        <VariantCard key={v.id} variant={v} onExport={onExport} />
       ))}
     </div>
   )

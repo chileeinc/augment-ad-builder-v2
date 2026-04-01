@@ -8,12 +8,11 @@ const baseVariant: Variant = {
   layout: 'big-type-body',
   theme: 'dark',
   background: 'none',
-  copy_angle: 'benefit',
-  headline: 'Code faster with AI',
-  cta: 'Try free →',
-  stat: null,
-  stat_label: null,
-  reasoning: 'test'
+  reasoning: 'test',
+  input: {
+    adType: 'big-headline', headline: 'Code faster with AI',
+    body: null, cta: 'Try free →', stat: null, statLabel: null, context: null
+  }
 }
 
 describe('AdRenderer', () => {
@@ -45,13 +44,28 @@ describe('AdRenderer', () => {
   })
 
   it('renders stat-hero layout', () => {
-    const variant = { ...baseVariant, layout: 'stat-hero' as const, stat: '10%', stat_label: 'faster' }
+    const variant = {
+      ...baseVariant,
+      layout: 'stat-hero' as const,
+      input: { ...baseVariant.input, stat: '10%', statLabel: 'faster' } as typeof baseVariant.input
+    }
     const { container } = render(<AdRenderer variant={variant} />)
     expect(container.querySelector('.tpl-sh')).toBeTruthy()
   })
 
   it('renders customer-quote layout', () => {
-    const variant = { ...baseVariant, layout: 'customer-quote' as const }
+    const variant = {
+      ...baseVariant,
+      layout: 'customer-quote' as const,
+      input: {
+        adType: 'quote' as const,
+        quote: 'Augment cut our review time in half.',
+        name: null,
+        titleAndCompany: null,
+        cta: null,
+        context: null
+      }
+    }
     const { container } = render(<AdRenderer variant={variant} />)
     expect(container.querySelector('.tpl-cq')).toBeTruthy()
   })

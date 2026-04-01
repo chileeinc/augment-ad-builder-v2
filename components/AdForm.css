@@ -1,0 +1,141 @@
+.ad-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 720px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.ad-type-toggle {
+  display: flex;
+  gap: 0;
+  border: 1px solid #2a2a35;
+  border-radius: 3px;
+  overflow: hidden;
+  align-self: flex-start;
+}
+
+.ad-type-btn {
+  padding: 8px 20px;
+  background: transparent;
+  border: none;
+  color: #555;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.ad-type-btn.active {
+  background: #1AA049;
+  color: #000;
+  font-weight: 600;
+}
+
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.field-label span {
+  color: #333;
+  margin-left: 4px;
+}
+
+.field-input,
+.field-textarea {
+  background: #111114;
+  border: 1px solid #2a2a35;
+  border-radius: 3px;
+  color: #f5f5f7;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 300;
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+.field-input:focus,
+.field-textarea:focus { border-color: #1AA049; }
+.field-input::placeholder,
+.field-textarea::placeholder { color: #333; }
+
+.field-textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.form-divider {
+  height: 1px;
+  background: #1a1a22;
+}
+
+.platforms-label {
+  font-size: 10px;
+  color: #555;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.platforms-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.platform-chip {
+  padding: 6px 12px;
+  border: 1px solid #2a2a35;
+  border-radius: 2px;
+  background: transparent;
+  color: #555;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.platform-chip:hover { border-color: #444; color: #888; }
+.platform-chip.selected { border-color: #1AA049; color: #1AA049; }
+
+.generate-btn {
+  align-self: flex-start;
+  background: #1AA049;
+  color: #000;
+  border: none;
+  border-radius: 2px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 24px;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  transition: opacity 0.15s;
+}
+.generate-btn:hover { opacity: 0.85; }
+.generate-btn:disabled { opacity: 0.4; cursor: not-allowed; }
