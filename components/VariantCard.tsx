@@ -22,6 +22,8 @@ export default function VariantCard({ variant, onExport }: Props) {
           <span className="variant-tag accent">{variant.layout}</span>
           <span className="variant-tag">{variant.theme}</span>
           <span className="variant-tag">{variant.background}</span>
+          <span className="variant-tag">{variant.alignment}</span>
+          <span className="variant-tag">{variant.verticalAlign}</span>
         </div>
         <div className="variant-reasoning">{variant.reasoning}</div>
       </div>

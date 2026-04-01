@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Augment — 6 Layout Logics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #07070a;
+      color: #f5f5f7;
+      font-family: 'Inter', -apple-system, 'Helvetica Neue', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      padding: 72px 72px 96px;
+    }
+
+    /* ── Page header ── */
+    .page-header { max-width: 600px; margin-bottom: 80px; }
+    .eyebrow {
+      font-size: 10px; font-weight: 500; letter-spacing: 0.16em;
+      text-transform: uppercase; color: #1AA049; margin-bottom: 14px;
+    }
+    .page-title {
+      font-size: 38px; font-weight: 200; letter-spacing: -0.03em;
+      color: #f5f5f7; line-height: 1.1; margin-bottom: 12px;
+    }
+    .page-sub { font-size: 13px; color: #3a3a3a; line-height: 1.6; margin-bottom: 20px; }
+    .copy-block {
+      border-left: 1px solid #1e1e26; padding: 10px 16px;
+      display: flex; flex-direction: column; gap: 5px;
+    }
+    .copy-row { font-size: 11px; color: #2a2a2a; }
+    .copy-row b { color: #333; font-weight: 500; margin-right: 6px; }
+
+    /* ── Grid ── */
+    .grid { display: grid; grid-template-columns: 480px 480px; gap: 72px 44px; }
+
+    /* ── Ad canvas ── */
+    .ad { width: 480px; height: 480px; position: relative; overflow: hidden; flex-shrink: 0; }
+
+    /* ── Themes ── */
+    .dark {
+      background: #0a0a0b; color: #f5f5f7;
+      --fg: #f5f5f7; --fg-muted: #888; --fg-dim: #3a3a3a;
+      --accent: #1AA049; --border: #1e1e26; --border-mid: #2a2a35;
+    }
+    .light {
+      background: #ffffff; color: #111;
+      --fg: #111; --fg-muted: #666; --fg-dim: #bbb;
+      --accent: #1AA049; --border: #e8e8e8; --border-mid: #d4d4d4;
+    }
+    .tonal {
+      background: #002400; color: #99F7A9;
+      --fg: #99F7A9; --fg-muted: #5CCC76; --fg-dim: #1a3a1a;
+      --accent: #99F7A9; --border: #1a3a1a; --border-mid: #0d2a0d;
+    }
+
+    /* ── Card label ── */
+    .card-label { margin-top: 14px; }
+    .card-num { font-size: 10px; color: #2a2a2a; letter-spacing: 0.06em; margin-bottom: 2px; }
+    .card-name { font-size: 15px; font-weight: 400; color: #d0d0d0; letter-spacing: -0.01em; margin-bottom: 4px; }
+    .card-info { font-size: 11px; color: #333; display: flex; gap: 8px; align-items: center; }
+    .pip { width: 4px; height: 4px; border-radius: 50%; background: #1AA049; flex-shrink: 0; }
+
+    /* ── Logo paths inherit currentColor ── */
+    .logo path { fill: currentColor; }
+
+
+    /* ════════════════════════════════════════════════
+       01 · MONUMENT
+    ════════════════════════════════════════════════ */
+    .l-monument { display: flex; flex-direction: column; padding: 28px 24px; }
+    .l-monument .logo { width: 100px; height: 15px; color: var(--fg-dim); flex-shrink: 0; }
+    .l-monument .hl {
+      flex: 1;
+      font-size: 72px; font-weight: 200;
+      line-height: 0.93; letter-spacing: -0.05em;
+      padding-top: 14px; color: var(--fg);
+    }
+    .l-monument .hl span { display: block; }
+    /* Intentionally micro — Monument's CTA is tucked away per layout logic */
+    .l-monument .cta-tiny {
+      font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--fg-dim); text-align: right; flex-shrink: 0;
+    }
+
+
+    /* ════════════════════════════════════════════════
+       02 · GRID REGISTER
+    ════════════════════════════════════════════════ */
+    .l-register { display: flex; flex-direction: column; height: 100%; }
+    .reg-row { padding: 0 28px; border-bottom: 1px solid var(--border); }
+    .reg-row.meta {
+      padding-top: 10px; padding-bottom: 10px;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-shrink: 0;
+    }
+    /* Structural label — intentionally small, not reading copy */
+    .reg-row.meta span { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-dim); }
+    .reg-row.meta .logo { width: 80px; height: 12px; color: var(--fg-dim); }
+    .reg-row.headline {
+      padding-top: 22px; padding-bottom: 20px;
+      flex: 1; display: flex; align-items: flex-end;
+    }
+    .reg-row.headline .hl {
+      font-size: 52px; font-weight: 200; line-height: 0.97; letter-spacing: -0.04em; color: var(--fg);
+    }
+    .reg-row.body { padding-top: 14px; padding-bottom: 14px; flex-shrink: 0; }
+    .reg-row.body p { font-size: 14px; line-height: 1.5; color: var(--fg-muted); }
+    .reg-row.footer {
+      padding-top: 14px; padding-bottom: 14px;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-shrink: 0; border-bottom: none;
+    }
+    .reg-row.footer .stat { display: flex; flex-direction: column; gap: 3px; }
+    .reg-row.footer .stat-n { font-size: 28px; font-weight: 700; letter-spacing: -0.04em; color: var(--accent); line-height: 1; }
+    .reg-row.footer .stat-l { font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--fg-dim); }
+    .reg-row.footer .cta { font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+
+
+    /* ════════════════════════════════════════════════
+       03 · SIGNAL + NOISE
+    ════════════════════════════════════════════════ */
+    .l-signal { position: relative; display: flex; align-items: center; }
+    .l-signal .noise { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+    .l-signal .signal { position: relative; z-index: 1; padding: 44px; }
+    .l-signal .logo { width: 100px; height: 15px; color: var(--fg-muted); margin-bottom: 32px; }
+    .l-signal .hl {
+      font-size: 48px; font-weight: 200; line-height: 1.04; letter-spacing: -0.03em;
+      color: var(--fg); margin-bottom: 18px;
+    }
+    .l-signal .body { font-size: 14px; line-height: 1.6; color: var(--fg-muted); margin-bottom: 22px; max-width: 300px; }
+    .l-signal .cta { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 500; }
+
+
+    /* ════════════════════════════════════════════════
+       04 · QUIET SYSTEM
+    ════════════════════════════════════════════════ */
+    .l-quiet { position: relative; padding: 36px 44px; }
+    .l-quiet .logo { position: absolute; top: 36px; left: 44px; width: 100px; height: 15px; color: var(--fg-dim); }
+    /* CTA in top-right — opposing corner from logo */
+    .l-quiet .cta-corner {
+      position: absolute; top: 38px; right: 44px;
+      font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-muted);
+    }
+    .l-quiet .main {
+      position: absolute; top: 50%; left: 44px; right: 44px;
+      transform: translateY(-50%);
+    }
+    .l-quiet .hl { font-size: 36px; font-weight: 300; line-height: 1.22; letter-spacing: -0.025em; color: var(--fg); margin-bottom: 18px; }
+    .l-quiet .body { font-size: 14px; line-height: 1.65; color: var(--fg-muted); }
+
+
+    /* ════════════════════════════════════════════════
+       05 · FOOTNOTE
+    ════════════════════════════════════════════════ */
+    .l-footnote { display: flex; flex-direction: column; padding: 32px 40px; }
+    .l-footnote .logo { width: 100px; height: 15px; color: var(--fg-dim); flex-shrink: 0; }
+    .l-footnote .hl {
+      font-size: 54px; font-weight: 200; line-height: 1.02;
+      letter-spacing: -0.035em; color: var(--fg); padding-top: 20px;
+    }
+    .l-footnote .spacer { flex: 1; }
+    .l-footnote .fn { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; }
+    .l-footnote .fn-body { font-size: 13px; line-height: 1.55; color: var(--fg-muted); max-width: 260px; }
+    .l-footnote .fn-cta { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 500; white-space: nowrap; flex-shrink: 0; }
+
+
+    /* ════════════════════════════════════════════════
+       06 · CORNER ANCHOR
+    ════════════════════════════════════════════════ */
+    .l-corner { position: relative; }
+    .l-corner .tr {
+      position: absolute; top: 28px; right: 28px;
+      display: flex; flex-direction: column; align-items: flex-end; gap: 9px;
+    }
+    .l-corner .tr .logo { width: 100px; height: 15px; color: var(--fg-dim); }
+    .l-corner .tr .cta { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 500; }
+    .l-corner .bl { position: absolute; bottom: 28px; left: 28px; max-width: 68%; }
+    .l-corner .hl { font-size: 46px; font-weight: 200; line-height: 1.04; letter-spacing: -0.03em; color: var(--fg); margin-bottom: 12px; }
+    .l-corner .body { font-size: 14px; line-height: 1.55; color: var(--fg-muted); }
+  </style>
+</head>
+<body>
+
+  <!-- Logo symbol -->
+  <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <symbol id="aug" viewBox="0 0 1391 205">
+        <path d="M1295.71 109.124C1296.62 135.17 1315.34 147.744 1333.59 147.744C1351.85 147.744 1361.89 139.661 1367.14 127.761H1388.59C1382.88 148.642 1363.49 165.707 1333.59 165.707C1294.8 165.707 1273.35 138.314 1273.35 102.613C1273.35 64.442 1299.36 39.9678 1332.91 39.9678C1370.33 39.9678 1392.93 70.9535 1390.19 109.124H1295.71ZM1295.94 91.6106H1368.28C1367.82 74.546 1354.82 57.4814 1332.91 57.4814C1314.42 57.4814 1297.77 67.3609 1295.94 91.6106Z" fill="currentColor"/>
+        <path d="M1239.11 0H1259.88V162.787H1239.11V144.6C1231.58 157.398 1218.57 165.706 1198.95 165.706C1170.88 165.706 1146.46 142.804 1146.46 102.837C1146.46 63.094 1170.88 39.967 1198.95 39.967C1218.57 39.967 1231.58 48.2748 1239.11 61.0732V0ZM1204.2 57.4807C1182.98 57.4807 1169.06 74.0962 1169.06 102.837C1169.06 131.577 1182.98 148.192 1204.2 148.192C1222.68 148.192 1240.03 134.72 1240.03 102.837C1240.03 70.9527 1222.68 57.4807 1204.2 57.4807Z" fill="currentColor"/>
+        <path d="M1139.12 102.837C1139.12 146.621 1108.77 165.707 1080.25 165.707C1051.72 165.707 1021.37 146.621 1021.37 102.837C1021.37 59.0532 1051.72 39.9678 1080.25 39.9678C1108.77 39.9678 1139.12 59.0532 1139.12 102.837ZM1080.25 147.744C1098.96 147.744 1116.99 133.823 1116.99 102.837C1116.99 70.7289 1098.96 57.9305 1080.25 57.9305C1061.54 57.9305 1043.51 69.8308 1043.51 102.837C1043.51 134.946 1061.54 147.744 1080.25 147.744Z" fill="currentColor"/>
+        <path d="M1014.29 82.4047H993.299C990.332 68.0345 977.553 57.9305 961.579 57.9305C943.095 57.9305 926.208 72.0761 926.208 102.388C926.208 133.149 943.323 147.744 961.579 147.744C978.922 147.744 991.245 136.293 994.212 123.494H1015.66C1011.55 146.172 989.419 165.707 960.894 165.707C925.751 165.707 903.616 139.436 903.616 102.613C903.616 66.6873 926.664 39.9678 962.948 39.9678C992.614 39.9678 1011.55 61.9721 1014.29 82.4047Z" fill="currentColor"/>
+        <path d="M811.307 11.6753H832.073V41.9874H855.35V58.3783H832.073V130.005C832.073 142.579 832.986 145.722 844.852 145.722H855.35V162.787H840.288C816.784 162.787 811.307 157.622 811.307 132.475V58.3783H791.91V41.9874H811.307V11.6753Z" fill="currentColor"/>
+        <path d="M705.052 60.1758C712.126 48.7246 723.992 39.9678 744.759 39.9678C774.425 39.9678 785.15 58.8286 785.15 86.4463V162.788H764.384V92.5087C764.384 73.8724 761.189 57.706 737.456 57.706C717.375 57.706 705.052 71.4025 705.052 97.2239V162.788H684.285V41.9886H705.052V60.1758Z" fill="currentColor"/>
+        <path d="M576.449 109.124C577.362 135.17 596.074 147.744 614.33 147.744C632.586 147.744 642.627 139.661 647.876 127.761H669.327C663.622 148.642 644.225 165.707 614.33 165.707C575.536 165.707 554.085 138.314 554.085 102.613C554.085 64.442 580.1 39.9678 613.646 39.9678C651.071 39.9678 673.663 70.9535 670.924 109.124H576.449ZM576.677 91.6106H649.017C648.561 74.546 635.553 57.4814 613.646 57.4814C595.161 57.4814 578.503 67.3609 576.677 91.6106Z" fill="currentColor"/>
+        <path d="M388.887 162.788H368.121V41.9886H388.887V60.1758C395.961 48.7246 407.371 39.9678 425.856 39.9678C444.568 39.9678 455.75 48.051 461.227 61.2985C471.039 46.4793 485.416 39.9678 502.531 39.9678C531.056 39.9678 542.238 58.8286 542.238 86.4463V162.788H521.472V92.5087C521.472 73.8724 517.821 57.706 495.229 57.706C477.429 57.706 465.563 71.4025 465.563 97.2239V162.788H444.796V92.5087C444.796 73.8724 441.145 57.706 418.553 57.706C400.753 57.706 388.887 71.4025 388.887 97.2239V162.788Z" fill="currentColor"/>
+        <path d="M325.402 41.9886H346.169V146.621C346.169 171.32 341.605 181.424 334.531 189.058C325.631 199.162 310.341 205 292.085 205C264.244 205 245.532 192.426 241.653 167.952H263.788C266.527 178.73 273.144 187.037 292.313 187.037C303.495 187.037 311.939 183.894 317.415 178.056C321.979 173.341 325.402 167.728 325.402 151.337V139.885C317.872 152.684 306.005 160.767 286.38 160.767C259.224 160.767 234.35 139.212 234.35 100.367C234.35 61.7476 259.224 39.9678 286.38 39.9678C306.005 39.9678 317.872 48.2755 325.402 61.074V41.9886ZM291.629 57.4814C271.319 57.4814 256.942 72.9743 256.942 100.367C256.942 127.985 271.319 143.478 291.629 143.478C310.113 143.478 326.315 131.129 326.315 100.367C326.315 69.8308 310.113 57.4814 291.629 57.4814Z" fill="currentColor"/>
+        <path d="M199.924 145.503C192.85 156.954 181.668 165.711 161.358 165.711C132.833 165.711 122.107 146.85 122.107 119.232V41.9927H142.873V113.17C142.873 131.806 146.068 147.973 168.66 147.973C188.286 147.973 199.924 134.276 199.924 108.455V41.9927H220.69V162.792H199.924V145.503Z" fill="currentColor"/>
+        <path d="M0 130.902C0 102.386 32.6328 94.0783 83.0653 88.465V85.546C83.0653 63.5417 70.5142 56.1321 55.2247 56.1321C38.1096 56.1321 28.0688 65.338 27.156 80.1572H5.70503C7.75885 54.1113 31.0354 39.5166 54.9965 39.5166C88.7703 39.5166 104.06 55.4585 103.832 89.3631L103.603 117.205C103.375 137.413 104.516 151.334 106.798 162.786H85.8037C85.1191 158.295 84.4345 153.355 84.2063 146.17C76.6757 158.52 63.8964 165.705 42.2173 165.705C19.1689 165.705 0 153.131 0 130.902ZM84.6627 104.631C47.0095 108.448 23.0483 113.837 23.0483 130.453C23.0483 141.904 31.9482 149.538 46.7813 149.538C66.1784 149.538 84.6627 140.781 84.6627 112.266V104.631Z" fill="currentColor"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <!-- Page header -->
+  <header class="page-header">
+    <p class="eyebrow">Augment Code · Ad System</p>
+    <h1 class="page-title">6 Layout Logics</h1>
+    <p class="page-sub">Each layout defines a distinct compositional behavior — not a style. Same copy, six authored frames.</p>
+    <div class="copy-block">
+      <div class="copy-row"><b>Headline</b>Stop breaking downstream dependencies.</div>
+      <div class="copy-row"><b>Body</b>Catch issues earlier with full-repo context.</div>
+      <div class="copy-row"><b>CTA</b>See it in action →</div>
+    </div>
+  </header>
+
+  <div class="grid">
+
+    <!-- ══════════════════════════════════════
+         01 · MONUMENT
+    ══════════════════════════════════════ -->
+    <div>
+      <div class="ad dark l-monument">
+        <svg class="logo" viewBox="0 0 1391 205" width="100" height="15"><use href="#aug"/></svg>
+        <div class="hl">
+          <span>Stop</span>
+          <span>breaking</span>
+          <span>downstream</span>
+          <span>dependencies.</span>
+        </div>
+        <div class="cta-tiny">see it in action →</div>
+      </div>
+      <div class="card-label">
+        <p class="card-num">01 / 06</p>
+        <p class="card-name">Monument</p>
+        <div class="card-info"><span class="pip"></span><span>Headline crops past right edge · dark</span></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         02 · GRID REGISTER
+    ══════════════════════════════════════ -->
+    <div>
+      <div class="ad dark l-register">
+        <div class="reg-row meta">
+          <span>Augment / augment.com</span>
+          <span>Full-Repo Context</span>
+        </div>
+        <div class="reg-row headline">
+          <div class="hl">Stop breaking<br>downstream<br>dependencies.</div>
+        </div>
+        <div class="reg-row body">
+          <p>Catch issues earlier with full-repo context. Works across your entire codebase.</p>
+        </div>
+        <div class="reg-row footer">
+          <div class="stat">
+            <div class="stat-n">87%</div>
+            <div class="stat-l">Context accuracy</div>
+          </div>
+          <div class="cta">See it in action →</div>
+        </div>
+      </div>
+      <div class="card-label">
+        <p class="card-num">02 / 06</p>
+        <p class="card-name">Grid Register</p>
+        <div class="card-info"><span class="pip"></span><span>Horizontal rules define sections — lines as architecture · dark</span></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         03 · SIGNAL + NOISE
+    ══════════════════════════════════════ -->
+    <div>
+      <div class="ad dark l-signal">
+        <svg class="noise" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="circuit" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+              <circle cx="0"  cy="0"  r="2"   fill="#1AA049" opacity="0.6"/>
+              <circle cx="40" cy="0"  r="2"   fill="#1AA049" opacity="0.6"/>
+              <circle cx="0"  cy="40" r="2"   fill="#1AA049" opacity="0.6"/>
+              <circle cx="40" cy="40" r="2"   fill="#1AA049" opacity="0.6"/>
+              <circle cx="20" cy="20" r="2"   fill="#1AA049" opacity="0.6"/>
+              <circle cx="20" cy="0"  r="1.2" fill="#1AA049" opacity="0.3"/>
+              <circle cx="0"  cy="20" r="1.2" fill="#1AA049" opacity="0.3"/>
+              <path d="M0,0 H20 V20" fill="none" stroke="#1AA049" stroke-width="0.6" opacity="0.35"/>
+              <path d="M40,0 V20 H20" fill="none" stroke="#1AA049" stroke-width="0.6" opacity="0.35"/>
+              <path d="M0,40 H20 V20" fill="none" stroke="#1AA049" stroke-width="0.6" opacity="0.25"/>
+              <circle cx="20" cy="20" r="5" fill="none" stroke="#1AA049" stroke-width="0.6" opacity="0.2"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#circuit)" opacity="0.18"/>
+        </svg>
+        <div class="signal">
+          <svg class="logo" viewBox="0 0 1391 205" width="100" height="15"><use href="#aug"/></svg>
+          <div class="hl">Stop breaking<br>downstream<br>dependencies.</div>
+          <p class="body">Catch issues earlier with full-repo context.</p>
+          <div class="cta">See it in action →</div>
+        </div>
+      </div>
+      <div class="card-label">
+        <p class="card-num">03 / 06</p>
+        <p class="card-name">Signal + Noise</p>
+        <div class="card-info"><span class="pip"></span><span>Circuit pattern behind restrained type · dark</span></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         04 · QUIET SYSTEM
+    ══════════════════════════════════════ -->
+    <div>
+      <div class="ad light l-quiet">
+        <svg class="logo" viewBox="0 0 1391 205" width="100" height="15"><use href="#aug"/></svg>
+        <div class="cta-corner">See it in action →</div>
+        <div class="main">
+          <div class="hl">Stop breaking<br>downstream<br>dependencies.</div>
+          <p class="body">Catch issues earlier with full-repo context.</p>
+        </div>
+      </div>
+      <div class="card-label">
+        <p class="card-num">04 / 06</p>
+        <p class="card-name">Quiet System</p>
+        <div class="card-info"><span class="pip"></span><span>CTA opposing corner from logo — no decorative lines · light</span></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         05 · FOOTNOTE
+    ══════════════════════════════════════ -->
+    <div>
+      <div class="ad light l-footnote">
+        <svg class="logo" viewBox="0 0 1391 205" width="100" height="15"><use href="#aug"/></svg>
+        <div class="hl">Stop breaking<br>downstream<br>dependencies.</div>
+        <div class="spacer"></div>
+        <div class="fn">
+          <p class="fn-body">Catch issues earlier with full-repo context. Works across your entire codebase.</p>
+          <div class="fn-cta">See it →</div>
+        </div>
+      </div>
+      <div class="card-label">
+        <p class="card-num">05 / 06</p>
+        <p class="card-name">Footnote</p>
+        <div class="card-info"><span class="pip"></span><span>Space between headline and footnote is the composition · light</span></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         06 · CORNER ANCHOR
+    ══════════════════════════════════════ -->
+    <div>
+      <div class="ad dark l-corner">
+        <div class="tr">
+          <svg class="logo" viewBox="0 0 1391 205" width="100" height="15"><use href="#aug"/></svg>
+          <div class="cta">See it in action →</div>
+        </div>
+        <div class="bl">
+          <div class="hl">Stop breaking<br>downstream<br>dependencies.</div>
+          <p class="body">Catch issues earlier with full-repo context.</p>
+        </div>
+      </div>
+      <div class="card-label">
+        <p class="card-num">06 / 06</p>
+        <p class="card-name">Corner Anchor</p>
+        <div class="card-info"><span class="pip"></span><span>CTA encountered before headline — reversed reading order · dark</span></div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

@@ -14,7 +14,9 @@ interface Props {
 export default function AdRenderer({ variant, className, style }: Props) {
   const themeClass = `theme-${variant.theme}`
   const bgClass = variant.background !== 'none' ? `bg-${variant.background}` : ''
-  const classes = ['ad-canvas', themeClass, bgClass, className]
+  const alignClass = `align-${variant.alignment}`
+  const valignClass = `valign-${variant.verticalAlign}`
+  const classes = ['ad-canvas', themeClass, bgClass, alignClass, valignClass, className]
     .filter(Boolean)
     .join(' ')
 

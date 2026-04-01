@@ -63,6 +63,28 @@
   background-size: 7px 7px;
 }
 
+/* ── Alignment: Center ── */
+.align-center .tpl-btb,
+.align-center .tpl-cq,
+.align-center .tpl-sh { text-align: center; }
+
+.align-center .btb-footer,
+.align-center .cq-footer { display: flex; justify-content: center; }
+
+/* Center aligns the stat-hero text content without breaking the footer layout */
+.align-center .sh-stat,
+.align-center .sh-stat-label,
+.align-center .sh-headline { text-align: center; }
+
+/* ── Vertical Align: Middle ── */
+/* BigTypeBody: center content vertically — collapse headline flex growth */
+.valign-middle .btb-main { justify-content: center; }
+.valign-middle .btb-headline,
+.valign-middle .btb-body { flex: none; }
+
+/* CustomerQuote: already defaults to center; top removes it */
+.valign-top .cq-content { justify-content: flex-start; }
+
 /* ── Background: Grid ── */
 .bg-grid.theme-dark {
   background-image:

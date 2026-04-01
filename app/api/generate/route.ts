@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { NextResponse } from 'next/server'
 import { readFileSync } from 'fs'
 import { join } from 'path'
-import { LAYOUTS, THEMES, BACKGROUNDS } from '@/lib/types'
+import { LAYOUTS, THEMES, BACKGROUNDS, ALIGNMENTS, VERTICAL_ALIGNS } from '@/lib/types'
 import type { GenerateRequest } from '@/lib/types'
 
 const VisualTreatmentSchema = z.object({
@@ -12,6 +12,8 @@ const VisualTreatmentSchema = z.object({
   layout: z.enum(LAYOUTS),
   theme: z.enum(THEMES),
   background: z.enum(BACKGROUNDS),
+  alignment: z.enum(ALIGNMENTS),
+  verticalAlign: z.enum(VERTICAL_ALIGNS),
   reasoning: z.string()
 })
 

@@ -8,6 +8,8 @@ const baseVariant: Variant = {
   layout: 'big-type-body',
   theme: 'dark',
   background: 'none',
+  alignment: 'left',
+  verticalAlign: 'top',
   reasoning: 'test',
   input: {
     adType: 'big-headline', headline: 'Code faster with AI',
@@ -43,6 +45,23 @@ describe('AdRenderer', () => {
     expect((container.firstChild as HTMLElement).className).not.toContain('bg-')
   })
 
+  it('applies align-left class by default', () => {
+    const { container } = render(<AdRenderer variant={baseVariant} />)
+    expect((container.firstChild as HTMLElement).className).toContain('align-left')
+  })
+
+  it('applies align-center class when alignment is center', () => {
+    const variant = { ...baseVariant, alignment: 'center' as const }
+    const { container } = render(<AdRenderer variant={variant} />)
+    expect((container.firstChild as HTMLElement).className).toContain('align-center')
+  })
+
+  it('applies valign-middle class when verticalAlign is middle', () => {
+    const variant = { ...baseVariant, verticalAlign: 'middle' as const }
+    const { container } = render(<AdRenderer variant={variant} />)
+    expect((container.firstChild as HTMLElement).className).toContain('valign-middle')
+  })
+
   it('renders stat-hero layout', () => {
     const variant = {
       ...baseVariant,
@@ -57,11 +76,13 @@ describe('AdRenderer', () => {
     const variant = {
       ...baseVariant,
       layout: 'customer-quote' as const,
+      alignment: 'left' as const,
+      verticalAlign: 'middle' as const,
       input: {
         adType: 'quote' as const,
         quote: 'Augment cut our review time in half.',
-        name: null,
-        titleAndCompany: null,
+        name: 'Sarah Chen',
+        titleAndCompany: 'Staff Engineer · Vercel',
         cta: null,
         context: null
       }

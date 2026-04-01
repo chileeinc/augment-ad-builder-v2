@@ -26,6 +26,8 @@ describe('Variant shape', () => {
       layout: 'stat-hero',
       theme: 'dark',
       background: 'dot-grid',
+      alignment: 'left',
+      verticalAlign: 'top',
       reasoning: 'Stat-led for LinkedIn feed impact',
       input: {
         adType: 'big-headline',
@@ -46,6 +48,8 @@ describe('Variant shape', () => {
       layout: 'customer-quote',
       theme: 'tonal',
       background: 'none',
+      alignment: 'center',
+      verticalAlign: 'middle',
       reasoning: 'Social proof for awareness campaign',
       input: {
         adType: 'quote',

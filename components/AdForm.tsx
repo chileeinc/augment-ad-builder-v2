@@ -30,6 +30,16 @@ export default function AdForm({ onGenerate, loading }: Props) {
   const [quoteCta, setQuoteCta] = useState('')
   const [quoteContext, setQuoteContext] = useState('')
 
+  function fillPlaceholder(
+    e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
+    setter: (v: string) => void
+  ) {
+    if (e.key === 'Tab' && !e.currentTarget.value) {
+      e.preventDefault()
+      setter(e.currentTarget.placeholder)
+    }
+  }
+
   function togglePlatform(p: Platform) {
     setPlatforms(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p])
   }
@@ -37,7 +47,7 @@ export default function AdForm({ onGenerate, loading }: Props) {
   function isValid() {
     if (platforms.length === 0) return false
     if (adType === 'big-headline') return headline.trim().length > 0
-    return quote.trim().length > 0
+    return quote.trim().length > 0 && name.trim().length > 0 && titleAndCompany.trim().length > 0
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -58,9 +68,9 @@ export default function AdForm({ onGenerate, loading }: Props) {
     } else {
       input = {
         adType: 'quote',
-        quote: quote.trim(),
-        name: name.trim() || null,
-        titleAndCompany: titleAndCompany.trim() || null,
+        quote: quote.trim().replace(/^["'"'"]+|["'"'"]+$/g, '').trim(),
+        name: name.trim(),
+        titleAndCompany: titleAndCompany.trim(),
         cta: quoteCta.trim() || null,
         context: quoteContext.trim() || null
       } satisfies QuoteInput
@@ -80,52 +90,52 @@ export default function AdForm({ onGenerate, loading }: Props) {
         <div className="form-fields">
           <div className="form-field">
             <label className="field-label">Headline</label>
-            <input className="field-input" value={headline} onChange={e => setHeadline(e.target.value)} placeholder="Code review, 10% faster." />
+            <input className="field-input" value={headline} onChange={e => setHeadline(e.target.value)} onKeyDown={e => fillPlaceholder(e, setHeadline)} placeholder="Code review, 10% faster." />
           </div>
           <div className="form-field">
-            <label className="field-label">Body copy <span>optional</span></label>
-            <textarea className="field-textarea" rows={2} value={body} onChange={e => setBody(e.target.value)} placeholder="Augment integrates with your existing tools and workflows." />
+            <label className="field-label">Body copy <span>Optional</span></label>
+            <textarea className="field-textarea" rows={2} value={body} onChange={e => setBody(e.target.value)} onKeyDown={e => fillPlaceholder(e, setBody)} placeholder="Augment integrates with your existing tools and workflows." />
           </div>
           <div className="form-row">
             <div className="form-field">
-              <label className="field-label">Stat <span>optional</span></label>
-              <input className="field-input" value={stat} onChange={e => setStat(e.target.value)} placeholder="10%" />
+              <label className="field-label">Stat <span>Optional</span></label>
+              <input className="field-input" value={stat} onChange={e => setStat(e.target.value)} onKeyDown={e => fillPlaceholder(e, setStat)} placeholder="10%" />
             </div>
             <div className="form-field">
-              <label className="field-label">Stat label <span>optional</span></label>
-              <input className="field-input" value={statLabel} onChange={e => setStatLabel(e.target.value)} placeholder="faster dev speed" />
+              <label className="field-label">Stat label <span>Optional</span></label>
+              <input className="field-input" value={statLabel} onChange={e => setStatLabel(e.target.value)} onKeyDown={e => fillPlaceholder(e, setStatLabel)} placeholder="faster dev speed" />
             </div>
           </div>
           <div className="form-field">
-            <label className="field-label">CTA <span>optional</span></label>
-            <input className="field-input" value={cta} onChange={e => setCta(e.target.value)} placeholder="Try free →" />
+            <label className="field-label">CTA <span>Optional</span></label>
+            <input className="field-input" value={cta} onChange={e => setCta(e.target.value)} onKeyDown={e => fillPlaceholder(e, setCta)} placeholder="Try free →" />
           </div>
           <div className="form-field">
-            <label className="field-label">Context <span>not shown in ad</span></label>
-            <input className="field-input" value={context} onChange={e => setContext(e.target.value)} placeholder="LinkedIn retargeting, senior devs who've seen the product" />
+            <label className="field-label">Context <span>Not shown in ad</span></label>
+            <input className="field-input" value={context} onChange={e => setContext(e.target.value)} onKeyDown={e => fillPlaceholder(e, setContext)} placeholder="LinkedIn retargeting, senior devs who've seen the product" />
           </div>
         </div>
       ) : (
         <div className="form-fields">
           <div className="form-field">
             <label className="field-label">Quote</label>
-            <textarea className="field-textarea" rows={3} value={quote} onChange={e => setQuote(e.target.value)} placeholder="Augment cut our review time in half." />
+            <textarea className="field-textarea" rows={3} value={quote} onChange={e => setQuote(e.target.value)} onKeyDown={e => fillPlaceholder(e, setQuote)} placeholder="Augment cut our review time in half." />
           </div>
           <div className="form-field">
-            <label className="field-label">Name <span>optional</span></label>
-            <input className="field-input" value={name} onChange={e => setName(e.target.value)} placeholder="Sarah Chen" />
+            <label className="field-label">Name</label>
+            <input className="field-input" value={name} onChange={e => setName(e.target.value)} onKeyDown={e => fillPlaceholder(e, setName)} placeholder="Sarah Chen" />
           </div>
           <div className="form-field">
-            <label className="field-label">Title & Company <span>optional</span></label>
-            <input className="field-input" value={titleAndCompany} onChange={e => setTitleAndCompany(e.target.value)} placeholder="Staff Engineer · Vercel" />
+            <label className="field-label">Title & Company</label>
+            <input className="field-input" value={titleAndCompany} onChange={e => setTitleAndCompany(e.target.value)} onKeyDown={e => fillPlaceholder(e, setTitleAndCompany)} placeholder="Staff Engineer · Vercel" />
           </div>
           <div className="form-field">
-            <label className="field-label">CTA <span>optional</span></label>
-            <input className="field-input" value={quoteCta} onChange={e => setQuoteCta(e.target.value)} placeholder="Read the story →" />
+            <label className="field-label">CTA <span>Optional</span></label>
+            <input className="field-input" value={quoteCta} onChange={e => setQuoteCta(e.target.value)} onKeyDown={e => fillPlaceholder(e, setQuoteCta)} placeholder="Read the story →" />
           </div>
           <div className="form-field">
-            <label className="field-label">Context <span>not shown in ad</span></label>
-            <input className="field-input" value={quoteContext} onChange={e => setQuoteContext(e.target.value)} placeholder="LinkedIn, social proof campaign" />
+            <label className="field-label">Context <span>Not shown in ad</span></label>
+            <input className="field-input" value={quoteContext} onChange={e => setQuoteContext(e.target.value)} onKeyDown={e => fillPlaceholder(e, setQuoteContext)} placeholder="LinkedIn, social proof campaign" />
           </div>
         </div>
       )}
