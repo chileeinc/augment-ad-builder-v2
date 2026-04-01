@@ -1,0 +1,84 @@
+/* ── Ad canvas base ── */
+.ad-canvas {
+  position: relative;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  container-type: size;
+}
+
+/* ── Theme: Dark ── */
+.theme-dark {
+  --ad-bg: #0a0a0b;
+  --ad-fg: #f5f5f7;
+  --ad-fg-muted: #888888;
+  --ad-fg-dim: #555555;
+  --ad-accent: #1AA049;
+  --ad-cta-text: #ffffff;
+  --ad-border: #1e1e26;
+  --ad-border-subtle: #2a2a35;
+  background-color: var(--ad-bg);
+  color: var(--ad-fg);
+}
+
+/* ── Theme: Light ── */
+.theme-light {
+  --ad-bg: #ffffff;
+  --ad-fg: #111111;
+  --ad-fg-muted: #666666;
+  --ad-fg-dim: #999999;
+  --ad-accent: #1AA049;
+  --ad-cta-text: #ffffff;
+  --ad-border: #e5e5e7;
+  --ad-border-subtle: #d0d0d4;
+  background-color: var(--ad-bg);
+  color: var(--ad-fg);
+}
+
+/* ── Theme: Tonal ── */
+/* bg: augment-700 (#002400), fg: augment-200 (#99F7A9) */
+.theme-tonal {
+  --ad-bg: #002400;
+  --ad-fg: #99F7A9;
+  --ad-fg-muted: #5CCC76;
+  --ad-fg-dim: #1a3a1a;
+  --ad-accent: #99F7A9;
+  --ad-cta-text: #002400;
+  --ad-border: #1a3a1a;
+  --ad-border-subtle: #0d2a0d;
+  background-color: var(--ad-bg);
+  color: var(--ad-fg);
+}
+
+/* ── Background: Dot Grid ── */
+.bg-dot-grid.theme-dark {
+  background-image: radial-gradient(circle, #2a2a35 1px, transparent 1px);
+  background-size: 7px 7px;
+}
+.bg-dot-grid.theme-light {
+  background-image: radial-gradient(circle, #f0f0f4 1px, transparent 1px);
+  background-size: 7px 7px;
+}
+.bg-dot-grid.theme-tonal {
+  background-image: radial-gradient(circle, #0d2e0d 1px, transparent 1px);
+  background-size: 7px 7px;
+}
+
+/* ── Background: Grid ── */
+.bg-grid.theme-dark {
+  background-image:
+    linear-gradient(to right, #1e1e26 1px, transparent 1px),
+    linear-gradient(to bottom, #1e1e26 1px, transparent 1px);
+  background-size: 8px 8px;
+}
+.bg-grid.theme-light {
+  background-image:
+    linear-gradient(to right, #f2f2f5 1px, transparent 1px),
+    linear-gradient(to bottom, #f2f2f5 1px, transparent 1px);
+  background-size: 8px 8px;
+}
+.bg-grid.theme-tonal {
+  background-image:
+    linear-gradient(to right, #0a2a0a 1px, transparent 1px),
+    linear-gradient(to bottom, #0a2a0a 1px, transparent 1px);
+  background-size: 8px 8px;
+}
