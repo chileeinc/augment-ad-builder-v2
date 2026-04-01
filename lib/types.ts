@@ -2,7 +2,7 @@ export type Theme = 'dark' | 'light' | 'tonal'
 export type Background = 'none' | 'dot-grid' | 'grid'
 export type Layout = 'big-type-body' | 'stat-hero' | 'customer-quote'
 export type CopyAngle = 'metric-led' | 'benefit' | 'bold-claim' | 'brand-awareness'
-export type Platform = 'linkedin' | 'instagram' | 'twitter' | 'reddit' | 'google-display'
+export type Platform = 'linkedin' | 'twitter' | 'reddit' | 'google-display'
 
 export interface Variant {
   id: string

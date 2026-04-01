@@ -4,20 +4,17 @@ import type { Variant, Platform } from './types'
 
 describe('PLATFORM_SIZES', () => {
   it('has an entry for every platform', () => {
-    const platforms: Platform[] = ['linkedin', 'instagram', 'twitter', 'reddit', 'google-display']
+    const platforms: Platform[] = ['linkedin', 'twitter', 'reddit', 'google-display']
     for (const p of platforms) {
       expect(PLATFORM_SIZES[p]).toBeDefined()
-      expect(PLATFORM_SIZES[p].length).toBeGreaterThan(0)
     }
   })
 
   it('each size has positive width and height', () => {
-    for (const sizes of Object.values(PLATFORM_SIZES)) {
-      for (const size of sizes) {
-        expect(size.width).toBeGreaterThan(0)
-        expect(size.height).toBeGreaterThan(0)
-        expect(size.label).toBeTruthy()
-      }
+    for (const size of Object.values(PLATFORM_SIZES)) {
+      expect(size.width).toBeGreaterThan(0)
+      expect(size.height).toBeGreaterThan(0)
+      expect(size.label).toBeTruthy()
     }
   })
 })

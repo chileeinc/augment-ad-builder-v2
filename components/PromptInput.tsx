@@ -9,7 +9,7 @@ interface Props {
   loading: boolean
 }
 
-const ALL_PLATFORMS: Platform[] = ['linkedin', 'instagram', 'twitter', 'reddit', 'google-display']
+const ALL_PLATFORMS: Platform[] = ['linkedin', 'twitter', 'reddit', 'google-display']
 
 export default function PromptInput({ onGenerate, loading }: Props) {
   const [prompt, setPrompt] = useState('')

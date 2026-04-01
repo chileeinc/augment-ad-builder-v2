@@ -18,7 +18,7 @@ const VariantSchema = z.object({
 })
 
 const ResponseSchema = z.object({
-  variants: z.array(VariantSchema).length(5)
+  variants: z.array(VariantSchema)
 })
 
 const SYSTEM_PROMPT = `You are an expert ad designer for Augment Code, an AI coding assistant for developers.

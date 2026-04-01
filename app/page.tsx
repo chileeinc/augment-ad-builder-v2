@@ -1,27 +1,28 @@
 'use client'
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import type { Variant, Platform } from '@/lib/types'
 import PromptInput from '@/components/PromptInput'
 import VariantGrid from '@/components/VariantGrid'
-import ExportModal from '@/components/ExportModal'
+import PlatformExportBar from '@/components/PlatformExportBar'
 import './page.css'
-
-interface ExportTarget {
-  element: HTMLElement
-  variant: Variant
-}
 
 export default function BuilderPage() {
   const [variants, setVariants] = useState<Variant[]>([])
   const [platforms, setPlatforms] = useState<Platform[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [exportTarget, setExportTarget] = useState<ExportTarget | null>(null)
+  const adRefs = useRef<Map<string, HTMLDivElement>>(new Map())
+
+  const registerRef = useCallback((id: string, el: HTMLDivElement | null) => {
+    if (el) adRefs.current.set(id, el)
+    else adRefs.current.delete(id)
+  }, [])
 
   async function handleGenerate(prompt: string, selectedPlatforms: Platform[]) {
     setLoading(true)
     setError(null)
     setPlatforms(selectedPlatforms)
+    adRefs.current.clear()
 
     try {
       const res = await fetch('/api/generate', {
@@ -60,21 +61,11 @@ export default function BuilderPage() {
       )}
 
       <div className="builder-variants">
-        <VariantGrid
-          variants={variants}
-          platforms={platforms}
-          loading={loading}
-          onExport={(el, v) => setExportTarget({ element: el, variant: v })}
-        />
+        <VariantGrid variants={variants} loading={loading} registerRef={registerRef} />
       </div>
 
-      {exportTarget && (
-        <ExportModal
-          variant={exportTarget.variant}
-          element={exportTarget.element}
-          platforms={platforms}
-          onClose={() => setExportTarget(null)}
-        />
+      {variants.length > 0 && (
+        <PlatformExportBar variants={variants} platforms={platforms} adRefs={adRefs.current} />
       )}
     </main>
   )

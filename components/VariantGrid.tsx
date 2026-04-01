@@ -1,16 +1,15 @@
 'use client'
-import type { Variant, Platform } from '@/lib/types'
+import type { Variant } from '@/lib/types'
 import VariantCard from './VariantCard'
 import './VariantGrid.css'
 
 interface Props {
   variants: Variant[]
-  platforms: Platform[]
   loading: boolean
-  onExport: (element: HTMLElement, variant: Variant) => void
+  registerRef: (id: string, el: HTMLDivElement | null) => void
 }
 
-export default function VariantGrid({ variants, platforms, loading, onExport }: Props) {
+export default function VariantGrid({ variants, loading, registerRef }: Props) {
   if (loading) {
     return (
       <div className="variant-grid-skeleton">
@@ -30,12 +29,7 @@ export default function VariantGrid({ variants, platforms, loading, onExport }: 
   return (
     <div className="variant-grid">
       {variants.map(v => (
-        <VariantCard
-          key={v.id}
-          variant={v}
-          platforms={platforms}
-          onExport={onExport}
-        />
+        <VariantCard key={v.id} variant={v} registerRef={registerRef} />
       ))}
     </div>
   )

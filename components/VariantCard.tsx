@@ -1,21 +1,23 @@
 'use client'
-import { useRef } from 'react'
-import type { Variant, Platform } from '@/lib/types'
+import { useCallback } from 'react'
+import type { Variant } from '@/lib/types'
 import AdRenderer from './AdRenderer'
 import './VariantCard.css'
 
 interface Props {
   variant: Variant
-  platforms: Platform[]
-  onExport: (element: HTMLElement, variant: Variant) => void
+  registerRef: (id: string, el: HTMLDivElement | null) => void
 }
 
-export default function VariantCard({ variant, platforms, onExport }: Props) {
-  const adRef = useRef<HTMLDivElement>(null)
+export default function VariantCard({ variant, registerRef }: Props) {
+  const setRef = useCallback(
+    (el: HTMLDivElement | null) => registerRef(variant.id, el),
+    [variant.id, registerRef]
+  )
 
   return (
     <div className="variant-card">
-      <div className="variant-ad-wrap" ref={adRef}>
+      <div className="variant-ad-wrap" ref={setRef}>
         <AdRenderer
           variant={variant}
           style={{ width: '100%', height: '100%' }}
@@ -30,12 +32,6 @@ export default function VariantCard({ variant, platforms, onExport }: Props) {
         </div>
         <div className="variant-reasoning">{variant.reasoning}</div>
       </div>
-      <button
-        className="variant-export-btn"
-        onClick={() => adRef.current && onExport(adRef.current, variant)}
-      >
-        Export →
-      </button>
     </div>
   )
 }
