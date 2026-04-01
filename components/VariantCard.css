@@ -1,0 +1,61 @@
+.variant-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.variant-ad-wrap {
+  aspect-ratio: 1;
+  width: 100%;
+  position: relative;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.variant-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.variant-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.variant-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: #555;
+  background: #111114;
+  border: 1px solid #1e1e26;
+  padding: 2px 6px;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.variant-tag.accent { color: #1AA049; border-color: #1a2a1a; }
+
+.variant-reasoning {
+  font-size: 10px;
+  color: #444;
+  line-height: 1.4;
+  font-style: italic;
+}
+
+.variant-export-btn {
+  align-self: flex-start;
+  background: transparent;
+  border: 1px solid #2a2a35;
+  color: #888;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 2px;
+  letter-spacing: 0.04em;
+  transition: border-color 0.15s, color 0.15s;
+}
+.variant-export-btn:hover { border-color: #1AA049; color: #1AA049; }
