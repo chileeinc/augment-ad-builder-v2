@@ -12,6 +12,15 @@
   overflow: hidden;
 }
 
+/* 1080×1080 canvas, scaled to fit the display container */
+.variant-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+  /* width/height set inline to CANVAS_SIZE */
+}
+
 .variant-meta {
   display: flex;
   flex-direction: column;
@@ -43,6 +52,27 @@
   color: var(--text-muted);
   line-height: 1.5;
   font-style: italic;
+}
+
+.variant-scores {
+  display: flex;
+  gap: 10px;
+}
+
+.score-item {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.score-label {
+  color: var(--text-muted);
+  opacity: 0.6;
+  font-size: 9px;
+  letter-spacing: 0.06em;
 }
 
 .variant-export-btn {

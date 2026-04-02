@@ -7,9 +7,11 @@ interface Props {
   variants: Variant[]
   loading: boolean
   onExport: (element: HTMLElement, variant: Variant) => void
+  onImageReady?: (variantId: string, dataUrl: string) => void
+  onCollision?: (variantId: string) => void
 }
 
-export default function VariantGrid({ variants, loading, onExport }: Props) {
+export default function VariantGrid({ variants, loading, onExport, onImageReady, onCollision }: Props) {
   if (loading) {
     return (
       <div className="variant-grid-skeleton">
@@ -29,7 +31,7 @@ export default function VariantGrid({ variants, loading, onExport }: Props) {
   return (
     <div className="variant-grid">
       {variants.map(v => (
-        <VariantCard key={v.id} variant={v} onExport={onExport} />
+        <VariantCard key={v.id} variant={v} onExport={onExport} onImageReady={onImageReady} onCollision={onCollision} />
       ))}
     </div>
   )

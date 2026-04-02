@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Size Preview — 1080px Canvas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Source+Code+Pro:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0a0a0b;
+      color: #fafafa;
+      font-family: 'Inter', sans-serif;
+      padding: 48px;
+      line-height: 1.5;
+    }
+
+    h1 {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #a1a1aa;
+      font-family: 'Source Code Pro', monospace;
+      margin-bottom: 6px;
+    }
+
+    .page-sub {
+      font-size: 12px;
+      color: #555;
+      font-family: 'Source Code Pro', monospace;
+      margin-bottom: 48px;
+    }
+
+    /* ── Section headers ── */
+    .section {
+      margin-bottom: 64px;
+    }
+
+    .section-label {
+      font-family: 'Source Code Pro', monospace;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: #1AA049;
+      margin-bottom: 16px;
+    }
+
+    .row {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    /* ── Canvas wrapper ── */
+    .canvas-outer {
+      flex-shrink: 0;
+    }
+
+    .canvas-label {
+      font-family: 'Source Code Pro', monospace;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    /* Scale 1080 → 480 for display */
+    .canvas-wrap {
+      width: 480px;
+      height: 480px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .canvas {
+      width: 1080px;
+      height: 1080px;
+      transform: scale(0.4444);
+      transform-origin: top left;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── Themes ── */
+    .dark  { background: #0a0a0b; color: #fafafa; }
+    .light { background: #ffffff; color: #0a0a0b; }
+    .tonal { background: #002400; color: #99F7A9; }
+
+    /* ── Grid background ── */
+    .bg-grid.dark {
+      background-image: linear-gradient(to right, #1e1e26 1px, transparent 1px), linear-gradient(to bottom, #1e1e26 1px, transparent 1px);
+      background-size: 12px 12px;
+      background-color: #0a0a0b;
+    }
+    .bg-grid.light {
+      background-image: linear-gradient(to right, #f2f2f5 1px, transparent 1px), linear-gradient(to bottom, #f2f2f5 1px, transparent 1px);
+      background-size: 12px 12px;
+      background-color: #ffffff;
+    }
+    .bg-dot.dark {
+      background-image: radial-gradient(circle, #2a2a35 1px, transparent 1px);
+      background-size: 7px 7px;
+      background-color: #0a0a0b;
+    }
+
+    /* ── Annotation panel ── */
+    .annotations {
+      max-width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-top: 8px;
+    }
+
+    .ann {
+      border-left: 2px solid #1AA049;
+      padding-left: 12px;
+    }
+
+    .ann-label {
+      font-family: 'Source Code Pro', monospace;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #1AA049;
+      margin-bottom: 2px;
+    }
+
+    .ann-value {
+      font-size: 13px;
+      font-weight: 500;
+      color: #fafafa;
+      margin-bottom: 2px;
+    }
+
+    .ann-note {
+      font-size: 11px;
+      color: #71717a;
+    }
+
+    /* ── Rulers (visual reference lines) ── */
+    .ruler-h {
+      position: absolute;
+      height: 1px;
+      background: rgba(255, 100, 100, 0.4);
+      left: 0;
+      right: 0;
+    }
+
+    .ruler-v {
+      position: absolute;
+      width: 1px;
+      background: rgba(255, 100, 100, 0.4);
+      top: 0;
+      bottom: 0;
+    }
+
+    .ruler-label {
+      position: absolute;
+      font-family: 'Source Code Pro', monospace;
+      font-size: 18px;
+      color: rgba(255, 100, 100, 0.8);
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Size Preview — 1080 × 1080px Canvas</h1>
+  <p class="page-sub">All canvases shown at 44.4% (480px display). Measurements are at true 1080px scale.</p>
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 1: LOGO MINIMUM (300px)
+  ═══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-label">Logo — Minimum 300px wide (27.8% of canvas)</div>
+    <div class="row">
+
+      <div class="canvas-outer">
+        <div class="canvas-label">Dark · Logo @ 300px min</div>
+        <div class="canvas-wrap">
+          <div class="canvas dark bg-grid">
+            <!-- Logo placeholder at minimum 300px -->
+            <div style="position:absolute;top:60px;left:60px;width:300px;font-size:36px;font-weight:300;letter-spacing:2px;color:#fafafa;text-transform:lowercase;">augment code</div>
+            <!-- Ruler showing 300px -->
+            <div class="ruler-h" style="top:110px;left:60px;width:300px;background:rgba(26,160,73,0.5);"></div>
+            <div class="ruler-label" style="top:118px;left:62px;color:rgba(26,160,73,0.9);font-size:18px;">← 300px →</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="canvas-outer">
+        <div class="canvas-label">Light · Logo @ 300px min</div>
+        <div class="canvas-wrap">
+          <div class="canvas light">
+            <div style="position:absolute;top:60px;left:60px;width:300px;font-size:36px;font-weight:300;letter-spacing:2px;color:#0a0a0b;text-transform:lowercase;">augment code</div>
+            <div class="ruler-h" style="top:110px;left:60px;width:300px;background:rgba(26,160,73,0.7);"></div>
+            <div class="ruler-label" style="top:118px;left:62px;color:rgba(26,160,73,1);font-size:18px;">← 300px →</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="annotations">
+        <div class="ann">
+          <div class="ann-label">Minimum</div>
+          <div class="ann-value">300px wide</div>
+          <div class="ann-note">27.8% of canvas. This is the floor — the wordmark must be readable at this size on the 1080px export.</div>
+        </div>
+        <div class="ann">
+          <div class="ann-label">Comfortable range</div>
+          <div class="ann-value">300 – 500px</div>
+          <div class="ann-note">At 400–500px (37–46% of canvas) the logo is clearly a brand anchor, not a footnote.</div>
+        </div>
+        <div class="ann">
+          <div class="ann-label">Note on placement</div>
+          <div class="ann-value">Always positioned deliberately</div>
+          <div class="ann-note">Top-left, top-right, or bottom anchored. Never floating or centered unless part of the concept.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 2: BODY COPY MINIMUM (30px)
+  ═══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-label">Body Copy — Minimum 30px (2.78% of canvas height)</div>
+    <div class="row">
+
+      <div class="canvas-outer">
+        <div class="canvas-label">Dark · Body @ 30px min · CTA @ 30px min</div>
+        <div class="canvas-wrap">
+          <div class="canvas dark">
+            <!-- Logo -->
+            <div style="position:absolute;top:60px;right:60px;width:300px;font-size:36px;font-weight:300;letter-spacing:2px;color:#fafafa;text-align:right;text-transform:lowercase;">augment code</div>
+            <!-- Eyebrow -->
+            <div style="position:absolute;top:300px;left:60px;font-size:22px;font-family:'Source Code Pro',monospace;text-transform:uppercase;letter-spacing:6px;color:#1AA049;">CODE REVIEW</div>
+            <!-- Headline -->
+            <div style="position:absolute;top:360px;left:60px;font-size:120px;font-weight:300;letter-spacing:-2px;line-height:0.92;max-width:900px;color:#fafafa;">10% faster.</div>
+            <!-- Body @ 30px -->
+            <div style="position:absolute;bottom:220px;left:60px;font-size:30px;font-weight:400;line-height:1.5;max-width:680px;color:#a1a1aa;">AI-powered code review that actually understands your codebase.</div>
+            <!-- Ruler for body -->
+            <div class="ruler-h" style="bottom:193px;left:60px;width:200px;background:rgba(255,100,100,0.5);"></div>
+            <div class="ruler-label" style="bottom:198px;left:62px;color:rgba(255,100,100,0.9);font-size:18px;">30px body</div>
+            <!-- CTA @ 30px -->
+            <div style="position:absolute;bottom:120px;left:60px;font-size:30px;font-weight:600;text-transform:uppercase;letter-spacing:3px;color:#1AA049;">Try free →</div>
+            <div class="ruler-h" style="bottom:93px;left:60px;width:200px;background:rgba(255,100,100,0.5);"></div>
+            <div class="ruler-label" style="bottom:98px;left:62px;color:rgba(255,100,100,0.9);font-size:18px;">30px CTA</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="canvas-outer">
+        <div class="canvas-label">Light · Body @ 30px min · CTA @ 30px min</div>
+        <div class="canvas-wrap">
+          <div class="canvas light bg-grid">
+            <!-- Logo -->
+            <div style="position:absolute;top:60px;left:60px;width:300px;font-size:36px;font-weight:300;letter-spacing:2px;color:#0a0a0b;text-transform:lowercase;">augment code</div>
+            <!-- Headline -->
+            <div style="position:absolute;top:260px;left:60px;font-size:100px;font-weight:300;letter-spacing:-2px;line-height:0.92;max-width:900px;color:#0a0a0b;">10% faster.</div>
+            <!-- Body @ 30px -->
+            <div style="position:absolute;bottom:220px;left:60px;font-size:30px;font-weight:400;line-height:1.5;max-width:680px;color:#71717a;">AI-powered code review that actually understands your codebase.</div>
+            <div class="ruler-h" style="bottom:193px;left:60px;width:200px;background:rgba(255,100,100,0.6);"></div>
+            <div class="ruler-label" style="bottom:198px;left:62px;color:rgba(200,50,50,1);font-size:18px;">30px body</div>
+            <!-- CTA @ 30px -->
+            <div style="position:absolute;bottom:120px;left:60px;font-size:30px;font-weight:600;text-transform:uppercase;letter-spacing:3px;color:#1AA049;">Try free →</div>
+            <div class="ruler-h" style="bottom:93px;left:60px;width:200px;background:rgba(255,100,100,0.6);"></div>
+            <div class="ruler-label" style="bottom:98px;left:62px;color:rgba(200,50,50,1);font-size:18px;">30px CTA</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="annotations">
+        <div class="ann">
+          <div class="ann-label">Body minimum</div>
+          <div class="ann-value">30px (≥ 30px)</div>
+          <div class="ann-note">Readable at export size. Previous spec was 13–14px which was invisible at 1080px.</div>
+        </div>
+        <div class="ann">
+          <div class="ann-label">CTA minimum</div>
+          <div class="ann-value">30px (≥ 30px)</div>
+          <div class="ann-note">Must hold its own next to a large headline without competing. Weight and tracking carry it.</div>
+        </div>
+        <div class="ann">
+          <div class="ann-label">Comfortable range</div>
+          <div class="ann-value">30 – 40px body / CTA</div>
+          <div class="ann-note">Upper end of this range gives the composition more air and legibility on smaller screens.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 3: HEADLINE SCALE MODES
+  ═══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-label">Headline Scale Modes — 48px to 200px range</div>
+    <div class="row">
+
+      <!-- Restrained: 48–80px -->
+      <div class="canvas-outer">
+        <div class="canvas-label">Restrained · 48–80px</div>
+        <div class="canvas-wrap">
+          <div class="canvas dark">
+            <div style="position:absolute;top:60px;left:60px;width:300px;font-size:36px;font-weight:300;letter-spacing:2px;color:#fafafa;text-transform:lowercase;">augment code</div>
+            <div style="position:absolute;top:320px;left:60px;font-size:22px;font-family:'Source Code Pro',monospace;text-transform:uppercase;letter-spacing:6px;color:#1AA049;">CODE REVIEW · 10%</div>
+            <div style="position:absolute;top:380px;left:60px;font-size:64px;font-weight:300;letter-spacing:-1px;line-height:1.05;max-width:900px;color:#fafafa;">Who wants to eat the last piece of cheese</div>
+            <div style="position:absolute;bottom:160px;left:60px;font-size:30px;font-weight:400;line-height:1.5;max-width:680px;color:#a1a1aa;">The last cheese. It's got all the flavours.</div>
+            <div style="position:absolute;bottom:80px;left:60px;font-size:30px;font-weight:600;text-transform:uppercase;letter-spacing:3px;color:#1AA049;">Eat now →</div>
+            <div class="ruler-label" style="top:360px;right:60px;color:rgba(26,160,73,0.7);font-size:18px;">64px headline</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bold: 100–140px -->
+      <div class="canvas-outer">
+        <div class="canvas-label">Bold · 100–140px</div>
+        <div class="canvas-wrap">
+          <div class="canvas dark bg-dot">
+            <div style="position:absolute;top:60px;right:60px;width:300px;font-size:36px;font-weight:300;letter-spacing:2px;color:#fafafa;text-align:right;text-transform:lowercase;">augment code</div>
+            <div style="position:absolute;top:60px;left:60px;font-size:22px;font-family:'Source Code Pro',monospace;text-transform:uppercase;letter-spacing:6px;color:#1AA049;">LAST PIECE</div>
+            <div style="position:absolute;top:220px;left:60px;font-size:130px;font-weight:300;letter-spacing:-3px;line-height:0.88;max-width:960px;color:#fafafa;">Who wants the cheese</div>
+            <div style="position:absolute;bottom:100px;left:60px;font-size:30px;font-weight:600;text-transform:uppercase;letter-spacing:3px;color:#1AA049;">Eat now →</div>
+            <div class="ruler-label" style="bottom:460px;right:60px;color:rgba(26,160,73,0.7);font-size:18px;">130px headline</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ultra-large: 160–200px -->
+      <div class="canvas-outer">
+        <div class="canvas-label">Ultra-large · 160–200px</div>
+        <div class="canvas-wrap">
+          <div class="canvas tonal">
+            <div style="position:absolute;top:60px;left:60px;width:300px;font-size:36px;font-weight:300;letter-spacing:2px;color:#99F7A9;text-transform:lowercase;">augment code</div>
+            <div style="position:absolute;top:200px;left:60px;font-size:185px;font-weight:300;letter-spacing:-5px;line-height:0.85;max-width:1000px;color:#99F7A9;">Who wants</div>
+            <div style="position:absolute;bottom:80px;right:60px;font-size:30px;font-weight:600;text-transform:uppercase;letter-spacing:3px;color:#99F7A9;text-align:right;">the cheese →</div>
+            <div class="ruler-label" style="bottom:460px;right:60px;color:rgba(153,247,169,0.5);font-size:18px;">185px headline</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="row" style="margin-top: 24px;">
+      <div class="annotations" style="max-width:860px;flex-direction:row;display:flex;gap:24px;">
+        <div class="ann" style="flex:1">
+          <div class="ann-label">Restrained (48–80px)</div>
+          <div class="ann-value">Editorial, nuanced</div>
+          <div class="ann-note">Works with a lot of copy. Reads like a quality publication. The type leads through hierarchy, not scale.</div>
+        </div>
+        <div class="ann" style="flex:1">
+          <div class="ann-label">Bold (100–140px)</div>
+          <div class="ann-value">Confident, direct</div>
+          <div class="ann-note">Natural stopping power. The headline is the first and second read. Copy and CTA are supporting.</div>
+        </div>
+        <div class="ann" style="flex:1">
+          <div class="ann-label">Ultra-large (160–200px)</div>
+          <div class="ann-value">Poster-scale, experiential</div>
+          <div class="ann-note">Words become shapes. Only works when the message is very short and the concept supports it.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 4: FULL COMPOSITION EXAMPLE
+  ═══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-label">Full composition — all minimum sizes together</div>
+    <div class="row">
+
+      <div class="canvas-outer">
+        <div class="canvas-label">Dark · Logo 300px · Headline 120px · Body 30px · CTA 30px</div>
+        <div class="canvas-wrap">
+          <div class="canvas dark bg-grid">
+            <div style="position:absolute;top:60px;left:60px;width:300px;font-size:36px;font-weight:300;letter-spacing:2px;color:#fafafa;text-transform:lowercase;">augment code</div>
+            <div style="position:absolute;top:60px;right:60px;font-size:22px;font-family:'Source Code Pro',monospace;text-transform:uppercase;letter-spacing:5px;color:#1AA049;">5% · more cheese</div>
+            <div style="position:absolute;top:280px;left:60px;font-size:120px;font-weight:300;letter-spacing:-2.5px;line-height:0.9;max-width:960px;color:#fafafa;">Who wants to eat the last piece</div>
+            <div style="position:absolute;bottom:200px;left:60px;font-size:30px;font-weight:400;line-height:1.5;max-width:680px;color:#a1a1aa;">The last cheese is the best cheese. It's got all the flavours wow so good everyone wants it.</div>
+            <div style="position:absolute;bottom:100px;left:60px;font-size:30px;font-weight:600;text-transform:uppercase;letter-spacing:3px;color:#1AA049;">Eat now →</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="canvas-outer">
+        <div class="canvas-label">Light · Logo 300px · Headline 80px · Body 30px · CTA 30px</div>
+        <div class="canvas-wrap">
+          <div class="canvas light">
+            <div style="position:absolute;bottom:60px;left:60px;width:300px;font-size:36px;font-weight:300;letter-spacing:2px;color:#0a0a0b;text-transform:lowercase;">augment code</div>
+            <div style="position:absolute;top:60px;left:60px;font-size:22px;font-family:'Source Code Pro',monospace;text-transform:uppercase;letter-spacing:5px;color:#1AA049;">one person only</div>
+            <div style="position:absolute;top:160px;left:60px;font-size:80px;font-weight:300;letter-spacing:-1.5px;line-height:1;max-width:900px;color:#0a0a0b;">Who wants to eat the last piece of cheese</div>
+            <div style="position:absolute;bottom:180px;right:60px;font-size:30px;font-weight:400;line-height:1.5;max-width:380px;color:#71717a;text-align:right;">The last cheese. Everyone wants it. Only one preson can have it.</div>
+            <div style="position:absolute;bottom:100px;right:60px;font-size:30px;font-weight:600;text-transform:uppercase;letter-spacing:3px;color:#1AA049;text-align:right;">Eat now →</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="annotations">
+        <div class="ann">
+          <div class="ann-label">Takeaway</div>
+          <div class="ann-value">These are the floors, not the targets</div>
+          <div class="ann-note">Minimum sizes ensure nothing is invisible at export. The AI should still push toward larger, bolder choices — these are the safety net.</div>
+        </div>
+        <div class="ann">
+          <div class="ann-label">Proportional intent</div>
+          <div class="ann-value">Logo ≥ 27.8% · Body ≥ 2.78%</div>
+          <div class="ann-note">If the canvas size ever changes, multiply these percentages by the new canvas dimension to get new minimums.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

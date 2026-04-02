@@ -1,29 +1,31 @@
-# Continue — 2026-04-01
+# Continue — 2026-04-02
 
 ## Current Goal
-Build the AI Ad Builder v2 — a Next.js 15 app where a user types a prompt, picks platforms, and gets 5 AI-generated ad variants they can export as PNG.
+Build a generative AI ad system where the AI invents compositions freely (not picks from templates), evaluated by a panel of three design judges before surfacing results.
 
 ## Where We Left Off
-Wrote the full MVP implementation plan. The plan is saved at `2- Tools/tool-ad-builder-v2/docs/superpowers/plans/2026-04-01-mvp-implementation.md`. The project folder exists but no code has been written yet — only docs and specs.
+Created `principles.md` and `acceptance-criteria.md`. Wired `principles.md` + `generation-guidelines.md` as the concatenated system prompt in `route.ts`. Uncommitted changes in branch `feat/generative-ai-builder`.
 
 ## Next Steps
-1. Choose execution approach: **Subagent-Driven** (dispatch fresh subagent per task) or **Inline** (execute in session). User was asked but hadn't answered before session-continue ran.
-2. Start at Task 1 of the plan: scaffold Next.js 15 inside `2- Tools/tool-ad-builder-v2/`
-3. Work through all 12 tasks in order to reach a working Vercel deploy
+1. Commit the uncommitted changes (route.ts, FreeformCanvas, types, guidelines, principles, acceptance-criteria)
+2. Build the `/api/evaluate` route — reads `acceptance-criteria.md`, scores the 5 variants using 3 judges, returns pass/fail per design
+3. Wire evaluate into the frontend — call generate → evaluate → show only passing designs
+4. Test the full pipeline end to end
 
 ## Active Files
-- `2- Tools/tool-ad-builder-v2/docs/superpowers/plans/2026-04-01-mvp-implementation.md` — implementation plan, 12 tasks, all code written out
-- `2- Tools/tool-ad-builder-v2/docs/superpowers/specs/2026-04-01-ai-ad-builder-design.md` — full product spec (stack updated to Next.js 15 + Vercel AI SDK)
+- `app/api/generate/route.ts` — system prompt now loads principles + guidelines; schema uses flat CSS strings
+- `components/FreeformCanvas.tsx` — parses AI CSS strings into React inline styles
+- `lib/types.ts` — GeneratedLayout uses flat CSS strings per element
+- `docs/principles.md` — 10 governing creative principles (new)
+- `docs/acceptance-criteria.md` — 3-judge panel: The Designer, The Taste Maker, The Growth Hacker (new)
+- `docs/generation-guidelines.md` — technical spec for AI output format (kept, loaded after principles)
 
 ## Decisions Made This Session
-- Framework: Next.js 15 App Router (not Vite) — keeps Anthropic key server-side, enables Vercel deploy
-- AI streaming: Vercel AI SDK (`ai` + `@ai-sdk/anthropic`) + `generateObject`
-- Export: `html-to-image` (already validated in v1)
-- Supabase: new project to be created, deferred to Plan 2
-- MVP templates: BigTypeBody, StatHero, CustomerQuote only (line-editorial + illustration deferred)
-- GitHub repo: `github.com/chileeinc/augment-ad-builder-v2`
-- Execution method: **not yet chosen** — ask user at start of next session
+- Replaced 3 hardcoded templates with freeform AI-authored layouts (AI outputs CSS strings)
+- Schema uses flat CSS strings per element to stay under Anthropic's 24 optional param limit
+- 3-judge acceptance panel: majority (2/3) required to pass; 6.5 threshold per judge
+- `principles.md` loads before `generation-guidelines.md` in system prompt
 
 ## Open Questions / Blockers
-- User needs to choose: Subagent-Driven vs Inline execution
-- Anthropic API key needed in `.env.local` before Task 7 smoke test
+- Evaluate route not yet built — designs are generated but not judged
+- Font loading (Source Code Pro for eyebrow/mono elements) not yet confirmed in production

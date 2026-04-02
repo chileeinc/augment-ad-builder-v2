@@ -5,12 +5,15 @@ import type { Variant } from '@/lib/types'
 
 const baseVariant: Variant = {
   id: 'v1',
-  layout: 'big-type-body',
+  concept: 'Gravity Pull',
   theme: 'dark',
   background: 'none',
-  alignment: 'left',
-  verticalAlign: 'top',
   reasoning: 'test',
+  logo: 'position:absolute;top:32px;right:32px;width:100px',
+  headline: 'position:absolute;bottom:72px;left:32px;font-size:72px;font-weight:300;letter-spacing:-1px;max-width:380px',
+  body: '',
+  eyebrow: '',
+  cta: 'position:absolute;bottom:32px;left:32px;font-size:13px;text-transform:uppercase;color:#1AA049',
   input: {
     adType: 'big-headline', headline: 'Code faster with AI',
     body: null, cta: 'Try free →', stat: null, statLabel: null, context: null
@@ -18,7 +21,7 @@ const baseVariant: Variant = {
 }
 
 describe('AdRenderer', () => {
-  it('renders without crashing for big-type-body', () => {
+  it('renders without crashing', () => {
     const { container } = render(<AdRenderer variant={baseVariant} />)
     expect(container.firstChild).toBeTruthy()
   })
@@ -35,7 +38,7 @@ describe('AdRenderer', () => {
   })
 
   it('applies bg-dot-grid class when background is dot-grid', () => {
-    const variant = { ...baseVariant, background: 'dot-grid' as const }
+    const variant = { ...baseVariant, background: 'dot-grid' }
     const { container } = render(<AdRenderer variant={variant} />)
     expect((container.firstChild as HTMLElement).className).toContain('bg-dot-grid')
   })
@@ -45,41 +48,16 @@ describe('AdRenderer', () => {
     expect((container.firstChild as HTMLElement).className).not.toContain('bg-')
   })
 
-  it('applies align-left class by default', () => {
-    const { container } = render(<AdRenderer variant={baseVariant} />)
-    expect((container.firstChild as HTMLElement).className).toContain('align-left')
+  it('renders headline copy', () => {
+    const { getByText } = render(<AdRenderer variant={baseVariant} />)
+    expect(getByText('Code faster with AI')).toBeTruthy()
   })
 
-  it('applies align-center class when alignment is center', () => {
-    const variant = { ...baseVariant, alignment: 'center' as const }
-    const { container } = render(<AdRenderer variant={variant} />)
-    expect((container.firstChild as HTMLElement).className).toContain('align-center')
-  })
-
-  it('applies valign-middle class when verticalAlign is middle', () => {
-    const variant = { ...baseVariant, verticalAlign: 'middle' as const }
-    const { container } = render(<AdRenderer variant={variant} />)
-    expect((container.firstChild as HTMLElement).className).toContain('valign-middle')
-  })
-
-  it('renders stat-hero layout', () => {
-    const variant = {
+  it('renders with quote input', () => {
+    const variant: Variant = {
       ...baseVariant,
-      layout: 'stat-hero' as const,
-      input: { ...baseVariant.input, stat: '10%', statLabel: 'faster' } as typeof baseVariant.input
-    }
-    const { container } = render(<AdRenderer variant={variant} />)
-    expect(container.querySelector('.tpl-sh')).toBeTruthy()
-  })
-
-  it('renders customer-quote layout', () => {
-    const variant = {
-      ...baseVariant,
-      layout: 'customer-quote' as const,
-      alignment: 'left' as const,
-      verticalAlign: 'middle' as const,
       input: {
-        adType: 'quote' as const,
+        adType: 'quote',
         quote: 'Augment cut our review time in half.',
         name: 'Sarah Chen',
         titleAndCompany: 'Staff Engineer · Vercel',
@@ -87,7 +65,18 @@ describe('AdRenderer', () => {
         context: null
       }
     }
+    const { getByText } = render(<AdRenderer variant={variant} />)
+    expect(getByText('Augment cut our review time in half.')).toBeTruthy()
+  })
+
+  it('renders custom CSS background', () => {
+    const variant = { ...baseVariant, background: 'linear-gradient(#002400, #004B07)' }
     const { container } = render(<AdRenderer variant={variant} />)
-    expect(container.querySelector('.tpl-cq')).toBeTruthy()
+    expect(container.firstChild).toBeTruthy()
+  })
+
+  it('omits body element when body string is empty', () => {
+    const { queryByText } = render(<AdRenderer variant={baseVariant} />)
+    expect(queryByText('null')).toBeNull()
   })
 })

@@ -23,7 +23,7 @@ export default function ExportModal({ variant, element, platforms, onClose }: Pr
     try {
       const varLabel = `var${variant.id.replace(/^v/, '')}`
       const filename = `${platform}-${size.label.replace(':', 'x')}-${varLabel}`
-      await exportAdElement(element, size.width, size.height, filename)
+      await exportAdElement(element, filename)
     } catch (err) {
       console.error('[export]', err)
       setExportError(err instanceof Error ? err.message : 'Export failed')
@@ -38,7 +38,7 @@ export default function ExportModal({ variant, element, platforms, onClose }: Pr
         <div>
           <div className="export-modal-title">Export variant</div>
           <div className="export-modal-subtitle">
-            {variant.layout} · {variant.theme} · {variant.background}
+            {variant.concept} · {variant.theme} · {variant.background}
           </div>
         </div>
         <div className="export-platforms">
