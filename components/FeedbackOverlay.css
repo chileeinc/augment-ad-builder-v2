@@ -1,0 +1,141 @@
+/* Thumbs — hidden by default, shown when .variant-ad-wrap is hovered */
+.fb-thumbs {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 10;
+  pointer-events: none;
+}
+.variant-ad-wrap:hover .fb-thumbs {
+  opacity: 1;
+  pointer-events: auto;
+}
+/* Hide thumbs when panel is open (panel z-index covers them anyway) */
+.fb-panel-open .fb-thumbs {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.fb-thumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(10,10,11,0.82);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.12s;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 0;
+  line-height: 1;
+}
+.fb-thumb:hover { transform: scale(1.08); border-color: rgba(255,255,255,0.25); }
+.fb-thumb.up:hover,  .fb-thumb.up.active  { border-color: #1AA049; background: rgba(26,160,73,0.22); }
+.fb-thumb.down:hover,.fb-thumb.down.active { border-color: #ff4444; background: rgba(255,68,68,0.22); }
+
+/* Feedback panel — overlays the ad canvas. Always dark regardless of UI theme. */
+.fb-panel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  z-index: 20;
+  border-radius: 2px;
+}
+.fb-panel-up   { background: rgba(10,10,11,0.95); border: 1px solid rgba(26,160,73,0.3); }
+.fb-panel-down { background: rgba(10,10,11,0.95); border: 1px solid rgba(255,68,68,0.3); }
+
+.fb-panel-header {
+  font-size: 10px;
+  font-family: var(--font-mono, monospace);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+}
+.fb-header-up   { color: #1AA049; }
+.fb-header-down { color: #ff5555; }
+
+/* Tags */
+.fb-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+.fb-tag {
+  font-size: 10px;
+  font-family: var(--font-mono, monospace);
+  color: #888;
+  border: 1px solid #2a2a35;
+  border-radius: 2px;
+  padding: 4px 8px;
+  cursor: pointer;
+  background: none;
+  transition: all 0.12s;
+}
+.fb-tag:hover { color: #aaa; border-color: #555; }
+.fb-tag-active-up   { color: #1AA049 !important; border-color: #1AA049 !important; background: rgba(26,160,73,0.1) !important; }
+.fb-tag-active-down { color: #ff5555 !important; border-color: #ff5555 !important; background: rgba(255,68,68,0.1) !important; }
+
+/* Free text — always light text on dark panel */
+.fb-note {
+  flex: 1;
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid #2a2a35;
+  border-radius: 2px;
+  color: #e8e8ec;
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  padding: 6px 8px;
+  resize: none;
+  outline: none;
+  line-height: 1.5;
+  margin-bottom: 8px;
+  min-height: 0;
+}
+.fb-note::placeholder { color: #444; }
+.fb-note:focus { border-color: #555; }
+
+/* Done button */
+.fb-done {
+  font-size: 10px;
+  font-family: var(--font-mono, monospace);
+  color: #888;
+  background: none;
+  border: 1px solid #2a2a35;
+  border-radius: 2px;
+  padding: 4px 10px;
+  cursor: pointer;
+  align-self: flex-end;
+  transition: all 0.12s;
+  letter-spacing: 0.06em;
+}
+.fb-done:hover { color: #f5f5f7; border-color: #555; }
+
+/* Voted badge */
+.fb-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  font-size: 9px;
+  font-family: var(--font-mono, monospace);
+  letter-spacing: 0.06em;
+  padding: 3px 7px;
+  border-radius: 2px;
+  z-index: 10;
+  pointer-events: none;
+}
+.fb-badge-up   { color: #1AA049; background: rgba(26,160,73,0.12); border: 1px solid rgba(26,160,73,0.25); }
+.fb-badge-down { color: #ff5555; background: rgba(255,68,68,0.1);  border: 1px solid rgba(255,68,68,0.2); }

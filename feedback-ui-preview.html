@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feedback UI — Interaction Preview</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0a0a0b;
+    color: #f5f5f7;
+    font-family: -apple-system, sans-serif;
+    padding: 48px 32px;
+  }
+  .label {
+    font-size: 10px;
+    font-family: monospace;
+    color: #1AA049;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 32px;
+  }
+  .grid {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  /* ── Card shell ── */
+  .card {
+    position: relative;
+    width: 220px;
+    flex-shrink: 0;
+  }
+
+  /* ── Ad canvas ── */
+  .ad-wrap {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    border-radius: 2px;
+    overflow: hidden;
+    cursor: default;
+  }
+
+  /* Fake ad content */
+  .ad-face {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #111114 0%, #1c1c28 100%);
+    border: 1px solid #2a2a35;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding: 20px;
+    transition: opacity 0.2s ease;
+  }
+  .ad-face .eyebrow {
+    font-size: 9px;
+    font-family: monospace;
+    color: #1AA049;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 8px;
+  }
+  .ad-face .headline {
+    font-size: 26px;
+    font-weight: 700;
+    color: #f5f5f7;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  .ad-face .cta {
+    font-size: 9px;
+    font-family: monospace;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border: 1px solid #2a2a35;
+    padding: 4px 10px;
+    border-radius: 2px;
+  }
+
+  /* Voted indicator on ad border */
+  .card.voted-up .ad-face   { border-color: rgba(26,160,73,0.5); }
+  .card.voted-down .ad-face { border-color: rgba(255,68,68,0.4); }
+
+  /* ── Thumbs — top-right corner, show on hover ── */
+  .thumbs {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 10;
+  }
+  .ad-wrap:hover .thumbs { opacity: 1; }
+  /* Always show if voted but feedback panel is closed */
+  .card.voted-up .thumbs,
+  .card.voted-down .thumbs { opacity: 1; }
+  /* Hide thumbs while feedback panel is open */
+  .card.feedback-open .thumbs { opacity: 0; pointer-events: none; }
+
+  .thumb {
+    width: 28px; height: 28px;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(10,10,11,0.85);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.15s;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    user-select: none;
+  }
+  .thumb:hover { transform: scale(1.08); border-color: rgba(255,255,255,0.25); }
+  .thumb.up:hover  { border-color: #1AA049; background: rgba(26,160,73,0.2); }
+  .thumb.down:hover { border-color: #ff4444; background: rgba(255,68,68,0.2); }
+
+  /* Active voted state on thumbs */
+  .card.voted-up   .thumb.up   { border-color: #1AA049; background: rgba(26,160,73,0.25); }
+  .card.voted-down .thumb.down { border-color: #ff4444; background: rgba(255,68,68,0.25); }
+
+  /* ── Feedback panel — overlays the ad space ── */
+  .feedback-panel {
+    position: absolute;
+    inset: 0;
+    border-radius: 2px;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease;
+    z-index: 20;
+  }
+  .feedback-panel.up   { background: rgba(10,10,11,0.96); border: 1px solid rgba(26,160,73,0.3); }
+  .feedback-panel.down { background: rgba(10,10,11,0.96); border: 1px solid rgba(255,68,68,0.3); }
+
+  .card.feedback-open .feedback-panel { opacity: 1; pointer-events: auto; }
+  .card.feedback-open .ad-face { opacity: 0.08; }
+
+  /* Panel header */
+  .panel-header {
+    font-size: 10px;
+    font-family: monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .panel-header.up   { color: #1AA049; }
+  .panel-header.down { color: #ff5555; }
+
+  /* Tags */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 12px;
+  }
+  .tag {
+    font-size: 10px;
+    font-family: monospace;
+    color: #666;
+    border: 1px solid #2a2a35;
+    border-radius: 2px;
+    padding: 4px 8px;
+    cursor: pointer;
+    background: none;
+    transition: all 0.12s;
+    white-space: nowrap;
+  }
+  .tag:hover { color: #aaa; border-color: #555; }
+  .tag.active.up   { color: #1AA049; border-color: #1AA049; background: rgba(26,160,73,0.1); }
+  .tag.active.down { color: #ff5555; border-color: #ff5555; background: rgba(255,68,68,0.1); }
+
+  /* Free text */
+  .note-field {
+    flex: 1;
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid #2a2a35;
+    border-radius: 2px;
+    color: #f5f5f7;
+    font-family: monospace;
+    font-size: 10px;
+    padding: 7px 8px;
+    resize: none;
+    outline: none;
+    line-height: 1.5;
+    margin-bottom: 10px;
+  }
+  .note-field::placeholder { color: #444; }
+  .note-field:focus { border-color: #555; }
+
+  /* Done button */
+  .done-btn {
+    font-size: 10px;
+    font-family: monospace;
+    color: #888;
+    background: none;
+    border: 1px solid #2a2a35;
+    border-radius: 2px;
+    padding: 5px 12px;
+    cursor: pointer;
+    align-self: flex-end;
+    transition: all 0.12s;
+    letter-spacing: 0.06em;
+  }
+  .done-btn:hover { color: #f5f5f7; border-color: #555; }
+
+  /* Voted badge — shown after done */
+  .voted-badge {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    font-size: 9px;
+    font-family: monospace;
+    letter-spacing: 0.06em;
+    padding: 3px 7px;
+    border-radius: 2px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .card.voted-up   .voted-badge { opacity: 1; color: #1AA049; background: rgba(26,160,73,0.12); border: 1px solid rgba(26,160,73,0.25); }
+  .card.voted-down .voted-badge { opacity: 1; color: #ff5555; background: rgba(255,68,68,0.1);  border: 1px solid rgba(255,68,68,0.2); }
+  .card.feedback-open .voted-badge { opacity: 0; }
+
+  /* State labels below grid */
+  .state-label {
+    font-size: 10px;
+    font-family: monospace;
+    color: #444;
+    text-align: center;
+    margin-top: 8px;
+    letter-spacing: 0.06em;
+  }
+
+  /* Instructions */
+  .instructions {
+    font-size: 11px;
+    font-family: monospace;
+    color: #555;
+    margin-bottom: 40px;
+    line-height: 1.8;
+  }
+  .instructions span { color: #888; }
+</style>
+</head>
+<body>
+
+<div class="label">Feedback UI — Live Interaction</div>
+<div class="instructions">
+  <span>Hover</span> card → thumbs appear in corner<br>
+  <span>Click</span> 👍 or 👎 → ad fades, feedback panel slides in<br>
+  <span>Pick tags</span> + optional note → click Done → ad returns with subtle badge
+</div>
+
+<div class="grid">
+
+  <!-- Card 1: Default (no vote) -->
+  <div>
+    <div class="card" id="c1">
+      <div class="ad-wrap">
+        <div class="ad-face">
+          <div class="eyebrow">Augment</div>
+          <div class="headline">Ship faster with AI</div>
+          <div class="cta">Get started free →</div>
+        </div>
+        <div class="thumbs">
+          <button class="thumb up"   onclick="openFeedback('c1','up')">👍</button>
+          <button class="thumb down" onclick="openFeedback('c1','down')">👎</button>
+        </div>
+        <!-- Up panel -->
+        <div class="feedback-panel up" id="c1-panel-up">
+          <div class="panel-header up">👍 What worked?</div>
+          <div class="tags">
+            <button class="tag" onclick="toggleTag(this,'up')">Strong Hierarchy</button>
+            <button class="tag" onclick="toggleTag(this,'up')">Clean Layout</button>
+            <button class="tag" onclick="toggleTag(this,'up')">Striking Composition</button>
+          </div>
+          <textarea class="note-field" placeholder="What should the AI do more of?"></textarea>
+          <button class="done-btn" onclick="closeFeedback('c1')">Done</button>
+        </div>
+        <!-- Down panel -->
+        <div class="feedback-panel down" id="c1-panel-down">
+          <div class="panel-header down">👎 What's wrong?</div>
+          <div class="tags">
+            <button class="tag" onclick="toggleTag(this,'down')">Too Crowded</button>
+            <button class="tag" onclick="toggleTag(this,'down')">Weak Hierarchy</button>
+            <button class="tag" onclick="toggleTag(this,'down')">Text Cut Off</button>
+          </div>
+          <textarea class="note-field" placeholder="What should the AI avoid?"></textarea>
+          <button class="done-btn" onclick="closeFeedback('c1')">Done</button>
+        </div>
+        <div class="voted-badge" id="c1-badge"></div>
+      </div>
+    </div>
+    <div class="state-label">Hover me</div>
+  </div>
+
+  <!-- Card 2: Mid-interaction (feedback panel open, thumbs up) -->
+  <div>
+    <div class="card feedback-open voted-up" id="c2">
+      <div class="ad-wrap">
+        <div class="ad-face">
+          <div class="eyebrow">Augment</div>
+          <div class="headline">Code reviews at the speed of thought</div>
+          <div class="cta">Try it now →</div>
+        </div>
+        <div class="thumbs">
+          <button class="thumb up">👍</button>
+          <button class="thumb down">👎</button>
+        </div>
+        <div class="feedback-panel up" style="opacity:1;pointer-events:auto;">
+          <div class="panel-header up">👍 What worked?</div>
+          <div class="tags">
+            <button class="tag active up">Strong Hierarchy</button>
+            <button class="tag" onclick="toggleTag(this,'up')">Clean Layout</button>
+            <button class="tag" onclick="toggleTag(this,'up')">Striking Composition</button>
+          </div>
+          <textarea class="note-field" placeholder="What should the AI do more of?">Headline completely dominates — nothing competing</textarea>
+          <button class="done-btn" onclick="closeFeedback('c2')">Done</button>
+        </div>
+        <div class="voted-badge">👍 Liked</div>
+      </div>
+    </div>
+    <div class="state-label">Feedback panel open</div>
+  </div>
+
+  <!-- Card 3: Voted down, panel open -->
+  <div>
+    <div class="card feedback-open voted-down" id="c3">
+      <div class="ad-wrap">
+        <div class="ad-face">
+          <div class="eyebrow">Augment</div>
+          <div class="headline">AI that gets out of your way</div>
+          <div class="cta">Learn more →</div>
+        </div>
+        <div class="thumbs">
+          <button class="thumb up">👍</button>
+          <button class="thumb down">👎</button>
+        </div>
+        <div class="feedback-panel down" style="opacity:1;pointer-events:auto;">
+          <div class="panel-header down">👎 What's wrong?</div>
+          <div class="tags">
+            <button class="tag active down">Too Crowded</button>
+            <button class="tag active down">Weak Hierarchy</button>
+            <button class="tag" onclick="toggleTag(this,'down')">Text Cut Off</button>
+          </div>
+          <textarea class="note-field" placeholder="What should the AI avoid?"></textarea>
+          <button class="done-btn" onclick="closeFeedback('c3')">Done</button>
+        </div>
+        <div class="voted-badge">👎 Disliked</div>
+      </div>
+    </div>
+    <div class="state-label">Feedback panel open (👎)</div>
+  </div>
+
+  <!-- Card 4: Done — back to ad, badge visible -->
+  <div>
+    <div class="card voted-up" id="c4">
+      <div class="ad-wrap">
+        <div class="ad-face">
+          <div class="eyebrow">Augment</div>
+          <div class="headline">Your AI pair programmer</div>
+          <div class="cta">Start coding →</div>
+        </div>
+        <div class="thumbs">
+          <button class="thumb up" onclick="openFeedback('c4','up')">👍</button>
+          <button class="thumb down" onclick="openFeedback('c4','down')">👎</button>
+        </div>
+        <div class="feedback-panel up" id="c4-panel-up">
+          <div class="panel-header up">👍 What worked?</div>
+          <div class="tags">
+            <button class="tag" onclick="toggleTag(this,'up')">Strong Hierarchy</button>
+            <button class="tag" onclick="toggleTag(this,'up')">Clean Layout</button>
+            <button class="tag" onclick="toggleTag(this,'up')">Striking Composition</button>
+          </div>
+          <textarea class="note-field" placeholder="What should the AI do more of?"></textarea>
+          <button class="done-btn" onclick="closeFeedback('c4')">Done</button>
+        </div>
+        <div class="feedback-panel down" id="c4-panel-down">
+          <div class="panel-header down">👎 What's wrong?</div>
+          <div class="tags">
+            <button class="tag" onclick="toggleTag(this,'down')">Too Crowded</button>
+            <button class="tag" onclick="toggleTag(this,'down')">Weak Hierarchy</button>
+            <button class="tag" onclick="toggleTag(this,'down')">Text Cut Off</button>
+          </div>
+          <textarea class="note-field" placeholder="What should the AI avoid?"></textarea>
+          <button class="done-btn" onclick="closeFeedback('c4')">Done</button>
+        </div>
+        <div class="voted-badge" id="c4-badge">👍 Liked</div>
+      </div>
+    </div>
+    <div class="state-label">Done — ad returns</div>
+  </div>
+
+</div>
+
+<script>
+  function openFeedback(cardId, direction) {
+    const card = document.getElementById(cardId)
+    // Remove prior vote classes
+    card.classList.remove('voted-up','voted-down')
+    card.classList.add('feedback-open', 'voted-' + direction)
+    // Show correct panel
+    const upPanel   = document.getElementById(cardId + '-panel-up')
+    const downPanel = document.getElementById(cardId + '-panel-down')
+    if (upPanel)   upPanel.style.opacity   = direction === 'up'   ? '1' : '0'
+    if (upPanel)   upPanel.style.pointerEvents = direction === 'up' ? 'auto' : 'none'
+    if (downPanel) downPanel.style.opacity = direction === 'down' ? '1' : '0'
+    if (downPanel) downPanel.style.pointerEvents = direction === 'down' ? 'auto' : 'none'
+  }
+
+  function closeFeedback(cardId) {
+    const card  = document.getElementById(cardId)
+    const badge = document.getElementById(cardId + '-badge')
+    card.classList.remove('feedback-open')
+    const isUp = card.classList.contains('voted-up')
+    if (badge) badge.textContent = isUp ? '👍 Liked' : '👎 Disliked'
+  }
+
+  function toggleTag(btn, direction) {
+    btn.classList.toggle('active')
+    if (btn.classList.contains('active')) btn.classList.add(direction)
+    else btn.classList.remove(direction)
+  }
+</script>
+</body>
+</html>

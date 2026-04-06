@@ -3,7 +3,7 @@ import { anthropic } from '@ai-sdk/anthropic'
 import { z } from 'zod'
 import { readFileSync } from 'fs'
 import { join } from 'path'
-import type { CoreUserMessage } from 'ai'
+import type { ImagePart, TextPart } from 'ai'
 import type { GeneratedLayout, VariantEvaluation, JudgeResult } from '@/lib/types'
 
 const CRITERIA = readFileSync(
@@ -56,7 +56,7 @@ async function evaluateAsJudge(
   const hasImages = images && images.length > 0
 
   if (hasImages) {
-    const content: CoreUserMessage['content'] = [
+    const content: Array<TextPart | ImagePart> = [
       {
         type: 'text',
         text: `You are acting exclusively as ${JUDGE_LABELS[role]}. Score each variant from your specific perspective. You can see the rendered ad image for each variant.`,

@@ -31,6 +31,8 @@ interface Props { variant: Variant }
 export default function FreeformCanvas({ variant }: Props) {
   const { input, logo, headline, body, eyebrow, cta } = variant
 
+  if (!input) return null
+
   // Resolve copy
   const headlineCopy = input.adType === 'big-headline' ? input.headline : input.quote
   const ctaCopy      = input.cta ?? null

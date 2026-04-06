@@ -2,26 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
-/* shadcn CSS variables — scoped to new UI pages only */
+/* shadcn CSS variables — prefixed with --ui- to avoid colliding with builder globals */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 4%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 4%;
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
-    --ring: 142 70% 45%;
-    --primary: 142 70% 45%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 5% 96%;
-    --secondary-foreground: 240 6% 10%;
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 46%;
-    --accent: 240 5% 96%;
-    --accent-foreground: 240 6% 10%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-    --radius: 0.375rem;
+    --ui-background: 0 0% 100%;
+    --ui-foreground: 240 10% 4%;
+    --ui-card: 0 0% 100%;
+    --ui-card-foreground: 240 10% 4%;
+    --ui-border: 240 6% 90%;
+    --ui-input: 240 6% 90%;
+    --ui-ring: 142 70% 45%;
+    --ui-primary: 142 70% 45%;
+    --ui-primary-foreground: 0 0% 100%;
+    --ui-secondary: 240 5% 96%;
+    --ui-secondary-foreground: 240 6% 10%;
+    --ui-muted: 240 5% 96%;
+    --ui-muted-foreground: 240 4% 46%;
+    --ui-accent: 240 5% 96%;
+    --ui-accent-foreground: 240 6% 10%;
+    --ui-destructive: 0 84% 60%;
+    --ui-destructive-foreground: 0 0% 100%;
+    --ui-radius: 0.375rem;
   }
 }

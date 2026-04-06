@@ -11,62 +11,64 @@
 - ✅ Ad form (big-headline + quote)
 - ✅ AI generation with 3-judge panel
 - ✅ Multi-generation accumulation (rows of 5)
-- ✅ DOM collision detection + silent replacement (capped)
+- ✅ DOM collision detection + skeleton overlay during replacement
+- ✅ Collision replacement patches DB so history shows the fixed variant
 - ✅ Vision scoring display (CD / Taste / Growth)
 - ✅ Export — 1:1 PNG (fixed, live element capture)
 - ✅ Light/dark UI toggle
+- ✅ Session history — slide-in panel, all generations shown, delete
+- ✅ Human feedback — 👍/👎 per card, tags, free-text notes, badge persists
+- ✅ Feedback persists across sessions — history panel pre-populates badges
+- ✅ AI learning loop — live DB read on every generation, 16 feedback records confirmed active
+- ✅ `/api/debug/feedback-context` — internal health check endpoint
 
 **Known debt (non-blocking):**
 - `lib/export.test.ts` calls old 4-arg signature — will fail if run. Update or delete.
-- Collision swap briefly visible to user (reactive model — acceptable for now)
+- Delete session button missing confirmation gate (listed in M2 below — still open)
 
 ---
 
-## Milestone 1 — Database Foundation
-*Everything else depends on this. Do this first.*
+## Milestone 1 — Database Foundation ✅
 
-- [x] Confirm Supabase project credentials are in `.env.local`
-- [x] Create `sessions` table — `id`, `created_at`, `platform_selection`, `ad_type`
-- [x] Create `variants` table — `id`, `session_id`, `generation_index`, `variant_data` (full JSON: CSS slots, copy, theme, scores), `created_at`
-- [x] Create `feedback` table — `id`, `variant_id`, `session_id`, `rating` (1–5), `tags` (array), `note` (text, nullable), `created_at`
-- [x] Create `reference_rules` table — `id`, `extracted_rules` (text), `image_count`, `updated_at`
-- [x] Write and run migrations
-- [x] Add Supabase client to `lib/supabase.ts`
-- [x] Verify connection works from the app
+- [x] Supabase credentials in `.env.local`
+- [x] `sessions` table
+- [x] `variants` table
+- [x] `feedback` table — `vote` (up/down), `tags`, `note`, unique constraint on `variant_id`
+- [x] `reference_rules` table
+- [x] `lib/supabase.ts` with browser client + `getSupabaseAdmin()` function
 
 ---
 
-## Milestone 2 — Session History
-*Depends on: Milestone 1*
+## Milestone 2 — Session History ✅
+*One item still open.*
 
-**Save sessions:**
-- [ ] On generation complete, save session + all 5 variants to Supabase
-- [ ] Each variant stores full JSON (all CSS, copy, theme, evaluation scores)
-- [ ] Session stores platform selection + ad type + timestamp
-
-**History page (`/history`):**
-- [ ] List all sessions, newest first
-- [ ] Each session shows: timestamp, ad type, thumbnail row of variant images (use captured vision eval images)
-- [ ] Click session → expands to show all 5 variant cards, re-renderable from stored JSON
-- [ ] Re-export works on historical variants (same export flow as main builder)
-- [ ] Delete session button — "are you sure?" confirmation — deletes session + its variants + feedback
+- [x] Save session + variants on generation complete
+- [x] All generations within a session saved (multi-generation support)
+- [x] History panel — slide-in, all sessions newest first, all generations shown
+- [x] Re-export from history works
+- [ ] Delete session — needs "are you sure?" confirmation gate
 
 ---
 
-## Milestone 3 — Human Feedback
-*Depends on: Milestone 1 + 2 (variants must be stored to attach feedback to)*
+## Milestone 3 — Human Feedback + AI Learning Loop ✅
 
-**Per-card feedback UI:**
-- [ ] Star rating (1–5) below each variant card — visible in both builder and history views
-- [ ] Tag picker: `Too crowded` · `Weak hierarchy` · `Off-brand` · `Good layout` · `Good vibe` · `Too safe`
-- [ ] Optional free text field (collapsed by default, expandable)
-- [ ] Submit saves to `feedback` table in Supabase, linked to `variant_id`
-- [ ] Submitted state persists — if user comes back to history, their rating is still shown
+- [x] `feedback` table migrated: `vote text` ('up'/'down'), `tags[]`, `note`
+- [x] 👍/👎 thumbs on each card, visible on hover
+- [x] Feedback panel overlays ad canvas within card footprint
+- [x] 👎 tags: `Too Crowded` · `Weak Hierarchy` · `Text Cut Off`
+- [x] 👍 tags: `Strong Hierarchy` · `Clean Layout` · `Striking Composition`
+- [x] Tags save on tap, note saves on blur, badge shows bottom-left after Done
+- [x] Re-clicking own thumb reopens panel showing existing feedback
+- [x] Feedback persists in history — badges pre-populated from DB
+- [x] `/api/generate` injects top 5 👍 as positive few-shot examples
+- [x] `/api/generate` injects top 3 👎 as negative few-shot examples
+- [x] Tag directives injected at 3+ votes (confirmed: `Text Cut Off`, `Strong Hierarchy`, `Clean Layout` all active)
+- [x] Last 5 free-text notes injected verbatim (5 detailed notes confirmed in DB)
 
 ---
 
 ## Milestone 4 — Platform Reflow
-*Depends on: nothing from above — can be done independently, but do it after M1–3 to keep focus*
+*Depends on: nothing from above — can be done independently*
 
 **Export modal update:**
 - [ ] Replace current flat platform list with size-grouped buttons:
@@ -98,17 +100,14 @@
 
 ---
 
-## Milestone 6 — Feedback Learning
-*Depends on: Milestone 3 (needs feedback data to summarize)*
+## Milestone 6 — Feedback Dashboard
+*Depends on: Milestone 3 (needs real feedback data)*
 
-**Learning pipeline:**
-- [ ] Background job: periodically summarizes feedback data — high-rated patterns become positive guidance, low-rated patterns become anti-patterns
-- [ ] Summaries stored in a `feedback_rules` table (similar to `reference_rules`)
-- [ ] `/api/generate` injects feedback-derived guidance alongside reference rules
-
-**Dashboard (`/admin` — add a tab or section):**
-- [ ] Aggregate view: average rating per tag, most common tags, highest/lowest rated variants
-- [ ] Human-readable — designed for a non-technical marketer to review trends
+**Dashboard (tab in `/admin` or standalone `/admin/feedback`):**
+- [ ] Vote counts per tag (bar chart or table)
+- [ ] Most common tags on 👍 vs 👎 variants
+- [ ] Recent free-text notes (last 20, newest first)
+- [ ] Human-readable — designed for a non-technical marketer
 
 ---
 
@@ -118,7 +117,7 @@
 - [ ] Delete or update `lib/export.test.ts` (calls old 4-arg signature)
 - [ ] Delete or update `components/AdRenderer.test.tsx` (stale)
 - [ ] Delete or update `lib/types.test.ts` (stale Variant shape)
-- [ ] Add per-card loading skeleton during collision replacement (deferred UX improvement)
+- [ ] Add delete confirmation gate to history panel (from M2)
 
 ---
 

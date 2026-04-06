@@ -2,18 +2,23 @@
 import { useRef, useState, useEffect } from 'react'
 import type { Variant } from '@/lib/types'
 import AdRenderer from './AdRenderer'
+import FeedbackOverlay from './FeedbackOverlay'
+import type { FeedbackState } from './FeedbackOverlay'
 import './VariantCard.css'
 
 const CANVAS_SIZE = 1080
 
 interface Props {
   variant: Variant
+  sessionId?: string | null
+  initialFeedback?: FeedbackState | null
+  isReplacing?: boolean
   onExport: (element: HTMLElement, variant: Variant) => void
   onImageReady?: (variantId: string, dataUrl: string) => void
   onCollision?: (variantId: string) => void
 }
 
-export default function VariantCard({ variant, onExport, onImageReady, onCollision }: Props) {
+export default function VariantCard({ variant, sessionId, initialFeedback, isReplacing, onExport, onImageReady, onCollision }: Props) {
   const wrapRef   = useRef<HTMLDivElement>(null)
   const exportRef = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState(1)
@@ -88,6 +93,11 @@ export default function VariantCard({ variant, onExport, onImageReady, onCollisi
         >
           <AdRenderer ref={exportRef} variant={variant} style={{ width: CANVAS_SIZE, height: CANVAS_SIZE }} />
         </div>
+        {isReplacing ? (
+          <div className="variant-replacing-overlay">Fixing layout…</div>
+        ) : (
+          <FeedbackOverlay variantId={variant.id} sessionId={sessionId ?? null} initialFeedback={initialFeedback} />
+        )}
       </div>
       <div className="variant-meta">
         <div className="variant-tags">

@@ -1,6 +1,6 @@
 # Augment Ad Builder v2 — Product Spec
 
-**Last updated:** 2026-04-06
+**Last updated:** 2026-04-07
 **Status:** Active development
 
 **Stack:** Next.js App Router · Vercel AI SDK · Zod · html-to-image · Supabase · shadcn/ui + Tailwind
@@ -218,20 +218,58 @@ After all 5 cards in a generation are rendered, each card captures a 540px PNG o
 
 **Goal:** Improve future AI generations based on what humans rate highly.
 
-**Per-variant feedback:**
-- Star rating: 1–5
-- Tag selection (pick any): `Too crowded` · `Weak hierarchy` · `Off-brand` · `Good layout` · `Good vibe` · `Too safe`
-- Optional free text note (stored as context, not used as a hard rule)
+### Interaction model
 
-**Storage:** Supabase. Each feedback record links to a variant ID and session.
+- **👍 / 👎 on each variant card** — thumbs appear in top-right corner on hover. Tap fires immediately, no submit button.
+- **Feedback panel** — clicking a thumb fades the ad and reveals a panel within the same card footprint (ad never grows taller). Panel shows:
+  - Relevant tags (3 negative tags on 👎, 3 positive tags on 👍)
+  - One optional free-text line: *"What should the AI do more / less of?"*
+  - "Done" button — ad returns, small badge appears bottom-left (`👍 Liked` / `👎 Disliked`)
+- Top-right thumbs only visible on hover; badge is the only persistent indicator after voting.
+- Works identically in both the builder and the history panel.
 
-**Learning pipeline:**
-- Feedback data is periodically summarized into style guidance
-- High-rated tags and patterns inform the generation guidelines
-- Low-rated patterns are flagged as anti-patterns
-- Dashboard available for human review of aggregate feedback trends
+### Tags
 
-**Design principle:** Structured signal (rating + tags) drives learning. Free text is supplementary context. Non-designer feedback is valid — `Too crowded` maps directly to compositional density rules.
+**Negative (shown on 👎):**
+
+| Tag | What the AI reads in the data | What it changes |
+|---|---|---|
+| `Too Crowded` | High slot count, tight positioning, small font sizes | Fewer slots, larger type, more whitespace |
+| `Weak Hierarchy` | Headline font-size close to body/CTA font-size | Exaggerate size contrast between elements |
+| `Text Cut Off` | Slot position values near canvas edges, or overlapping slots | Keep elements away from borders, increase internal padding |
+
+**Positive (shown on 👍):**
+
+| Tag | What the AI reads in the data | What it reinforces |
+|---|---|---|
+| `Strong Hierarchy` | Large headline, significantly smaller secondary elements | Preserve this size ratio pattern |
+| `Clean Layout` | Low slot count, generous spacing | Minimal working — don't add more elements |
+| `Striking Composition` | Unusual or asymmetric slot positioning that scored well | Unconventional placement got approval — explore similar |
+
+### Storage
+
+Supabase `feedback` table. Each record: `variant_id`, `session_id`, `vote` (`up`/`down`), `tags` (array), `note` (text, nullable).
+
+### AI learning loop (hybrid — no cron job required)
+
+At generation time, `/api/generate` queries the DB live and injects:
+
+1. **Positive few-shot examples** — top 5 👍 `variant_data` JSON objects injected verbatim as "these compositions worked well"
+2. **Negative few-shot examples** — top 3 👎 `variant_data` JSON objects injected as "these were rated poorly — avoid similar patterns"
+3. **Structural tag hints** — if any structural tag has 3+ votes, a specific directive is added:
+   - `Too Crowded` ×3 → "Increase whitespace between slots, shrink secondary element font sizes, spread elements further apart — all user-provided fields must still appear"
+   - `Weak Hierarchy` ×3 → "Exaggerate size contrast — headline should dominate strongly"
+   - `Text Cut Off` ×3 → "Keep all elements well within canvas bounds. Elements should not clash with one another"
+   - `Strong Hierarchy` ×3 → "Large dominant headline with much smaller secondary elements is working well"
+   - `Clean Layout` ×3 → "Generous spacing and few competing elements are resonating — keep layouts open"
+   - `Striking Composition` ×3 → "Unconventional asymmetric layouts are getting positive responses"
+4. **Free text notes** — last 5 non-empty notes injected verbatim as "recent human feedback"
+
+**No export signal** — export events are not used as implicit positive ratings. A user may test-export many variants, which would skew the data.
+
+**No summarisation cron** — the loop reads live from DB on every generation. Always current, no background jobs.
+
+**If the learning feels off:** Adjust the tag-to-directive mapping in `/api/generate` or raise/lower the vote threshold (currently 3). The full logic is in `app/api/generate/route.ts`. The `feedback` table in Supabase is the source of truth — you can inspect or delete records directly there.
 
 ---
 

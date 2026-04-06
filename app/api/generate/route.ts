@@ -6,12 +6,113 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 import { THEMES } from '@/lib/types'
 import { validateVariant } from '@/lib/validate'
+import { getSupabaseAdmin } from '@/lib/supabase'
 import type { GenerateRequest, GeneratedLayout } from '@/lib/types'
 
 const SYSTEM_PROMPT = readFileSync(
   join(process.cwd(), 'docs/generation-guidelines.md'),
   'utf-8'
 )
+
+const TAG_DIRECTIVES: Record<string, string> = {
+  'Too Crowded':          'Increase whitespace between slots, shrink secondary element font sizes, spread elements further apart — all user-provided fields must still appear.',
+  'Weak Hierarchy':       'Exaggerate size contrast — headline should dominate strongly, secondary elements much smaller.',
+  'Text Cut Off':         'Keep all slots well within canvas bounds, generous edge padding, no slot should overlap another.',
+  'Strong Hierarchy':     'A large dominant headline with much smaller secondary elements is working well — preserve this pattern.',
+  'Clean Layout':         'Generous spacing and few competing elements are resonating — keep layouts open.',
+  'Striking Composition': 'Unconventional or asymmetric layouts are getting positive responses — explore similar placements.',
+}
+
+async function buildFeedbackContext(): Promise<string> {
+  try {
+    const supabase = getSupabaseAdmin()
+
+    // Top 5 liked variants
+    const { data: liked } = await supabase
+      .from('feedback')
+      .select('variant_id, tags, note, variants(variant_data)')
+      .eq('vote', 'up')
+      .order('created_at', { ascending: false })
+      .limit(5)
+
+    // Top 3 disliked variants
+    const { data: disliked } = await supabase
+      .from('feedback')
+      .select('variant_id, tags, note, variants(variant_data)')
+      .eq('vote', 'down')
+      .order('created_at', { ascending: false })
+      .limit(3)
+
+    // Tag vote counts
+    const { data: allFeedback } = await supabase
+      .from('feedback')
+      .select('vote, tags')
+
+    // Last 5 non-empty notes
+    const { data: notes } = await supabase
+      .from('feedback')
+      .select('note, vote')
+      .not('note', 'is', null)
+      .neq('note', '')
+      .order('created_at', { ascending: false })
+      .limit(5)
+
+    const lines: string[] = []
+
+    // Positive few-shot examples
+    if (liked?.length) {
+      lines.push('## Compositions humans rated highly (use as positive inspiration):')
+      for (const row of liked) {
+        const vd = (row.variants as unknown as { variant_data: unknown } | null)?.variant_data
+        if (vd) lines.push('```json\n' + JSON.stringify(vd, null, 2) + '\n```')
+      }
+    }
+
+    // Negative few-shot examples
+    if (disliked?.length) {
+      lines.push('## Compositions humans rated poorly (avoid similar patterns):')
+      for (const row of disliked) {
+        const vd = (row.variants as unknown as { variant_data: unknown } | null)?.variant_data
+        if (vd) lines.push('```json\n' + JSON.stringify(vd, null, 2) + '\n```')
+      }
+    }
+
+    // Tag directives (threshold: 3+ votes)
+    if (allFeedback?.length) {
+      const tagCounts: Record<string, number> = {}
+      for (const row of allFeedback) {
+        for (const tag of (row.tags as string[] ?? [])) {
+          tagCounts[tag] = (tagCounts[tag] ?? 0) + 1
+        }
+      }
+      const activeDirectives = Object.entries(tagCounts)
+        .filter(([, count]) => count >= 3)
+        .map(([tag]) => TAG_DIRECTIVES[tag])
+        .filter(Boolean)
+      if (activeDirectives.length) {
+        lines.push('## Structural guidance from user feedback:')
+        for (const d of activeDirectives) lines.push(`- ${d}`)
+      }
+    }
+
+    // Free text notes
+    if (notes?.length) {
+      lines.push('## Recent human feedback notes:')
+      for (const row of notes) {
+        const prefix = row.vote === 'up' ? 'Liked:' : 'Disliked:'
+        lines.push(`- ${prefix} "${row.note}"`)
+      }
+    }
+
+    const ctx = lines.length ? '\n\n---\n# Human Feedback Context\n' + lines.join('\n') : ''
+    if (ctx) console.log(`[feedback-context] injecting ${lines.length} lines into prompt`)
+    else console.log('[feedback-context] no feedback in DB yet — generating without learning context')
+    return ctx
+  } catch (e) {
+    console.error('[feedback-context]', e)
+    return ''
+  }
+}
 
 const GeneratedLayoutSchema = z.object({
   id:         z.string(),
@@ -61,11 +162,11 @@ function buildUserMessage(req: GenerateRequest, accepted?: GeneratedLayout[]): s
   return lines.join('\n')
 }
 
-async function generateBatch(req: GenerateRequest, count: number, accepted?: GeneratedLayout[]): Promise<GeneratedLayout[]> {
+async function generateBatch(req: GenerateRequest, count: number, feedbackContext: string, accepted?: GeneratedLayout[]): Promise<GeneratedLayout[]> {
   const { object } = await generateObject({
     model: anthropic('claude-sonnet-4-6'),
     schema: GenerateResponseSchema,
-    system: SYSTEM_PROMPT,
+    system: SYSTEM_PROMPT + feedbackContext,
     prompt: buildUserMessage(req, accepted) + `\n\nGenerate exactly ${count} variant${count === 1 ? '' : 's'}.`,
   })
   return object.variants as GeneratedLayout[]
@@ -104,6 +205,7 @@ export async function POST(req: Request) {
 
       try {
         const { evaluateVariants } = await import('@/lib/evaluate')
+        const feedbackContext = await buildFeedbackContext()
 
         const target = body.count ?? 5
         const passing: GeneratedLayout[] = []
@@ -121,7 +223,7 @@ export async function POST(req: Request) {
 
           const needed = Math.max(2, target - passing.length)
           const seedAccepted = body.accepted ?? (passing.length > 0 ? passing : undefined)
-          const batch = await generateBatch(body, needed, seedAccepted)
+          const batch = await generateBatch(body, needed, feedbackContext, seedAccepted)
           reviewed += batch.length
 
           // Deduplicate concept names within the batch — model sometimes repeats the same concept

@@ -6,6 +6,7 @@ import AdForm from '@/components/AdForm'
 import VariantGrid from '@/components/VariantGrid'
 import ExportModal from '@/components/ExportModal'
 import ThemeToggle from '@/components/ThemeToggle'
+import HistoryPanel from '@/components/HistoryPanel'
 import './page.css'
 
 interface ExportTarget {
@@ -53,6 +54,9 @@ export default function BuilderPage() {
   const [exportTarget, setExportTarget] = useState<ExportTarget | null>(null)
   const [capturedImages, setCapturedImages] = useState<Map<string, string>>(new Map())
   const [visionEvaluating, setVisionEvaluating] = useState(false)
+  const [historyOpen, setHistoryOpen] = useState(false)
+  const [sessionId, setSessionId] = useState<string | null>(null)
+  const [replacingIds, setReplacingIds] = useState<Set<string>>(new Set())
   // Tracks how many collision replacements each original slot has attempted.
   // Keyed by the original variantId (g1-v1). Capped at 2 to prevent infinite loops.
   const collisionAttemptsRef = useRef<Map<string, number>>(new Map())
@@ -62,13 +66,17 @@ export default function BuilderPage() {
   // Stable generation counter — incremented before each generation starts
   const genCounterRef = useRef(0)
 
+  // Session persistence
+  const sessionIdRef = useRef<string | null>(null)
+  const saveResultRef = useRef<{ sessionId: string; variantDbIds: Record<string, string> } | null>(null)
+
   async function handleGenerate(input: AdInput, selectedPlatforms: Platform[]) {
     setLoading(true)
     setError(null)
     setPlatforms(selectedPlatforms)
     setLoadingStatus('Starting…')
-
     const thisGenIdx = ++genCounterRef.current
+    let prefixedVariants: Variant[] = []
 
     try {
       const res = await fetch('/api/generate', {
@@ -85,11 +93,27 @@ export default function BuilderPage() {
       await readNdjsonStream(res.body, (event) => {
         if (event.type === 'status') setLoadingStatus(event.message as string)
         if (event.type === 'result') {
-          const prefixed = prefixVariants(event.variants as Variant[], thisGenIdx)
-          setGenerations(prev => [...prev, { variants: prefixed, meta: (event.meta as Generation['meta']) ?? null }])
+          prefixedVariants = prefixVariants(event.variants as Variant[], thisGenIdx)
+          setGenerations(prev => [...prev, { variants: prefixedVariants, meta: (event.meta as Generation['meta']) ?? null }])
         }
         if (event.type === 'error') throw new Error(event.message as string)
       })
+
+      // Save to Supabase via API route (service role key, bypasses RLS)
+      if (prefixedVariants.length > 0) {
+        fetch('/api/save-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId: sessionIdRef.current, input, platforms: selectedPlatforms, variants: prefixedVariants, genIndex: thisGenIdx }),
+        })
+          .then(r => r.json())
+          .then(result => {
+            sessionIdRef.current = result.sessionId
+            saveResultRef.current = result
+            setSessionId(result.sessionId)
+          })
+          .catch(err => console.error('[session-save]', err))
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
     } finally {
@@ -109,6 +133,9 @@ export default function BuilderPage() {
     const attempts = collisionAttemptsRef.current.get(slotKey) ?? 0
     if (attempts >= 2) return // give up after 2 replacement attempts per slot
     collisionAttemptsRef.current.set(slotKey, attempts + 1)
+
+    // Immediately show skeleton on the colliding card while replacement loads
+    setReplacingIds(prev => { const s = new Set(prev); s.add(variantId); return s })
 
     try {
       // Find which generation owns this variant
@@ -148,10 +175,29 @@ export default function BuilderPage() {
             variants: g.variants.map(v => v.id === variantId ? replacement : v),
           })))
           setCapturedImages(prev => { const m = new Map(prev); m.delete(variantId); return m })
+          setReplacingIds(prev => { const s = new Set(prev); s.delete(variantId); return s })
+
+          // Patch the DB so history shows the fixed variant, not the original colliding one
+          const dbId = saveResultRef.current?.variantDbIds[slotKey]
+          if (dbId) {
+            fetch('/api/patch-variant', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ variantDbId: dbId, variantData: replacement }),
+            }).catch(err => console.error('[patch-variant]', err))
+            // Keep variantDbIds map current so feedback still works for the replacement
+            if (saveResultRef.current) {
+              saveResultRef.current = {
+                ...saveResultRef.current,
+                variantDbIds: { ...saveResultRef.current.variantDbIds, [replacementId]: dbId },
+              }
+            }
+          }
         }
       })
     } catch (err) {
       console.error('[collision-replace]', err)
+      setReplacingIds(prev => { const s = new Set(prev); s.delete(variantId); return s })
     }
   }
 
@@ -182,16 +228,37 @@ export default function BuilderPage() {
       .then(r => r.json())
       .then(({ evaluations }) => {
         if (!evaluations) return
-        setGenerations(prev => prev.map((g, i) => {
-          if (i !== latestIdx) return g
-          return {
-            ...g,
-            variants: g.variants.map(v => {
-              const ev = evaluations.find((e: { id: string }) => e.id === v.id)
-              return ev ? { ...v, evaluation: ev } : v
-            }),
+        setGenerations(prev => {
+          const next = prev.map((g, i) => {
+            if (i !== latestIdx) return g
+            return {
+              ...g,
+              variants: g.variants.map(v => {
+                const ev = evaluations.find((e: { id: string }) => e.id === v.id)
+                return ev ? { ...v, evaluation: ev } : v
+              }),
+            }
+          })
+
+          // Patch evaluations + upload thumbnails after state is settled
+          const updatedGen = next[latestIdx]
+          const sid = sessionIdRef.current
+          if (updatedGen && saveResultRef.current && sid) {
+            const result = saveResultRef.current
+            const thumbnails: Record<string, string> = {}
+            for (const v of updatedGen.variants) {
+              const img = capturedImages.get(v.id)
+              if (img) thumbnails[v.id] = img
+            }
+            fetch('/api/patch-variants', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ variantDbIds: result.variantDbIds, variants: updatedGen.variants, sessionId: sid, thumbnails }),
+            }).catch(err => console.error('[patch-variants]', err))
           }
-        }))
+
+          return next
+        })
       })
       .catch(err => console.error('[vision-eval]', err))
       .finally(() => setVisionEvaluating(false))
@@ -204,7 +271,12 @@ export default function BuilderPage() {
           <div className="builder-title">Augment Ad Builder</div>
           <div className="builder-subtitle">Add your copy. Get 5 design variants.</div>
         </div>
-        <ThemeToggle />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button onClick={() => setHistoryOpen(true)} style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, letterSpacing: '0.06em' }}>
+            History
+          </button>
+          <ThemeToggle />
+        </div>
       </div>
 
       <AdForm onGenerate={handleGenerate} loading={loading} />
@@ -226,6 +298,8 @@ export default function BuilderPage() {
           <VariantGrid
             variants={gen.variants}
             loading={false}
+            sessionId={sessionId}
+            replacingIds={replacingIds}
             onExport={(el, variant) => setExportTarget({ element: el, variant })}
             onImageReady={handleImageReady}
             onCollision={handleCollision}
@@ -263,6 +337,8 @@ export default function BuilderPage() {
           onClose={() => setExportTarget(null)}
         />
       )}
+
+      <HistoryPanel open={historyOpen} onClose={() => setHistoryOpen(false)} />
     </main>
   )
 }
