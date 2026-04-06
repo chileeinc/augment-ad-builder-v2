@@ -12,13 +12,21 @@
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.64",
     "@supabase/supabase-js": "^2.101.1",
+    "@tailwindcss/postcss": "^4.2.2",
     "ai": "^6.0.142",
+    "autoprefixer": "^10.4.27",
+    "class-variance-authority": "^0.7.1",
     "client-only": "^0.0.1",
+    "clsx": "^2.1.1",
     "html-to-image": "^1.11.13",
+    "lucide-react": "^1.7.0",
     "next": "16.2.2",
+    "postcss": "^8.5.8",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "server-only": "^0.0.1",
+    "tailwind-merge": "^3.5.0",
+    "tailwindcss": "^3.4.19",
     "zod": "^4.3.6"
   },
   "devDependencies": {

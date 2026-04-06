@@ -3,6 +3,14 @@
 **Last updated:** 2026-04-06
 **Status:** Active development
 
+**Stack:** Next.js App Router · Vercel AI SDK · Zod · html-to-image · Supabase · shadcn/ui + Tailwind
+
+**CSS boundary:**
+- Ad canvas (`AdRenderer`, `FreeformCanvas`, `app/templates.css`) — plain CSS only, never Tailwind
+- Existing UI (`AdForm`, `ExportModal`, `VariantCard`) — plain CSS, migrate only during intentional redesigns
+- All new pages (`/history`, `/admin`, feedback UI) — shadcn/Tailwind from the start
+- Tailwind `preflight` disabled to prevent conflicts with existing CSS
+
 ---
 
 ## 1. What This Is
