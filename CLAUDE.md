@@ -1,7 +1,12 @@
 # tool-ad-builder-v2
 
 ## Source of Truth
-Read `SPEC.md` before doing any work in this project. It defines what this tool is, how it works, all data contracts, and the 9 invariants that must always hold. If something you're about to build contradicts the spec, flag it — don't just build it.
+At the start of every session, read these three files in order:
+1. `SPEC.md` — what this tool is, how everything works, data contracts, 9 invariants
+2. `PLAN.md` — what to build next and where we are (check off tasks as completed)
+3. `HANDOFF.md` — what happened in the last session specifically
+
+If something you're about to build contradicts the spec, flag it — don't just build it.
 
 ## Session Continuity
 If `HANDOFF.md` exists in this folder, read it before doing anything else.

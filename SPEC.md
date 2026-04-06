@@ -253,7 +253,7 @@ After all 5 cards in a generation are rendered, each card captures a 540px PNG o
 
 **Reference types:** Both external inspiration (competitor/peer ads, industry work) and internal Figma exports. All treated equally as style signal.
 
-**Influence:** Always active in background — informs compositional tendencies, mood, and visual ambition. Not tied to specific generations.
+**Influence:** Always active in background — informs compositional tendencies, mood, texture, and visual ambition. References must never influence brand colors or typography — those are locked in the brand system. References shape *how* a design feels, not *what colors or fonts* it uses.
 
 ---
 
