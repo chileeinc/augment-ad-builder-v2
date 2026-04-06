@@ -44,9 +44,17 @@ The `background` field accepts:
 | Body | Inter | 30–44px | 400 | Normal tracking, line-height 1.4–1.6 |
 | Eyebrow | Source Code Pro | 20–26px | 400 | Uppercase, letter-spacing 6px, accent color |
 | Mono label | Source Code Pro | 20–26px | 400 | Uppercase, letter-spacing 4px |
-| CTA | Inter | 30–40px | 500–600 | Uppercase optional, letter-spacing 2–4px |
+| CTA | Inter | 30–40px | 500–600 | Uppercase optional, letter-spacing 2–4px. Vary the visual treatment — see CTA Treatments below. |
 
 Set `fontFamily` to `"inter"` or `"mono"`. Inter is the default.
+
+### CTA Treatments
+
+The CTA div supports full CSS — borders, backgrounds, padding, display modes. Treat it as a design element with its own visual presence, not just a line of text. Ask yourself: what shape, weight, and finish does this CTA need to feel intentional in this specific composition?
+
+Resist defaulting to a bordered box. That is one option among many. Consider:  a filled solid block, a set of brackets, a mono-label system style, a large typographic treatment that makes the CTA feel like part of the headline. The CTA should feel native to the composition — not pasted on top of it.
+
+Let feedback guide your instincts — but always keep experimenting. Don't converge on a single style no matter how well it has performed.
 
 ### Logo
 - Always present. Width 300–500px (27–46% of canvas), fill = theme foreground color.
@@ -136,7 +144,7 @@ Example variant:
   "headline": "position:absolute;bottom:72px;left:32px;font-size:78px;font-weight:300;letter-spacing:-1.5px;line-height:0.92;max-width:400px",
   "body": "",
   "eyebrow": "position:absolute;top:36px;left:32px;font-size:9px;font-family:monospace;text-transform:uppercase;letter-spacing:3px;color:#1AA049",
-  "cta": "position:absolute;bottom:32px;left:32px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:#1AA049"
+  "cta": "position:absolute;bottom:32px;left:32px;font-size:30px;font-weight:500;text-transform:uppercase;letter-spacing:2px;color:#1AA049;border-bottom:1px solid #1AA049;padding-bottom:4px"
 }
 ```
 

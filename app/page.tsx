@@ -7,6 +7,7 @@ import VariantGrid from '@/components/VariantGrid'
 import ExportModal from '@/components/ExportModal'
 import ThemeToggle from '@/components/ThemeToggle'
 import HistoryPanel from '@/components/HistoryPanel'
+import JudgesModal from '@/components/JudgesModal'
 import './page.css'
 
 interface ExportTarget {
@@ -55,6 +56,7 @@ export default function BuilderPage() {
   const [capturedImages, setCapturedImages] = useState<Map<string, string>>(new Map())
   const [visionEvaluating, setVisionEvaluating] = useState(false)
   const [historyOpen, setHistoryOpen] = useState(false)
+  const [judgesOpen, setJudgesOpen] = useState(false)
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [replacingIds, setReplacingIds] = useState<Set<string>>(new Set())
   // Tracks how many collision replacements each original slot has attempted.
@@ -270,9 +272,13 @@ export default function BuilderPage() {
         <div className="builder-header-text">
           <div className="builder-title">Augment Ad Builder</div>
           <div className="builder-subtitle">Add your copy. Get 5 design variants.</div>
+          <div className="builder-description">This is an experiment. Turn copy into ad layouts. <button onClick={() => setJudgesOpen(true)} className="builder-description-link">Three AI judges</button> filter every design before you see it — only the best surface. Every thumbs up/down trains the next batch. The model learns with every generation [~1 min/gen].</div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <button onClick={() => setHistoryOpen(true)} style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, letterSpacing: '0.06em' }}>
+          <button onClick={() => setJudgesOpen(true)} style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-muted)', background: 'transparent', border: '1px solid var(--border)', borderRadius: '2px', cursor: 'pointer', padding: '6px 12px', textTransform: 'uppercase', letterSpacing: '0.08em', transition: 'border-color 0.15s, color 0.15s', flexShrink: 0 }}>
+            The Panel
+          </button>
+          <button onClick={() => setHistoryOpen(true)} style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-muted)', background: 'transparent', border: '1px solid var(--border)', borderRadius: '2px', cursor: 'pointer', padding: '6px 12px', textTransform: 'uppercase', letterSpacing: '0.08em', transition: 'border-color 0.15s, color 0.15s', flexShrink: 0 }}>
             History
           </button>
           <ThemeToggle />
@@ -339,6 +345,7 @@ export default function BuilderPage() {
       )}
 
       <HistoryPanel open={historyOpen} onClose={() => setHistoryOpen(false)} />
+      {judgesOpen && <JudgesModal onClose={() => setJudgesOpen(false)} />}
     </main>
   )
 }

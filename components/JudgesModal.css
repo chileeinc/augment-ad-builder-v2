@@ -1,0 +1,168 @@
+.judges-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.judges-modal {
+  background: var(--surface, #111114);
+  border: 1px solid var(--border, #2a2a35);
+  border-radius: 2px;
+  width: 100%;
+  max-width: 960px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Header */
+.judges-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px 32px 24px;
+  border-bottom: 1px solid var(--border, #2a2a35);
+}
+
+.judges-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent, #1AA049);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 8px;
+}
+
+.judges-subtitle {
+  font-size: 13px;
+  color: var(--text-muted, #888);
+  line-height: 1.5;
+  max-width: 480px;
+}
+
+.judges-close {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted, #888);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  letter-spacing: 0.06em;
+}
+
+/* Judge grid */
+.judges-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+}
+
+.judge-card {
+  padding: 28px 32px;
+  border-right: 1px solid var(--border, #2a2a35);
+}
+.judge-card:last-child {
+  border-right: none;
+}
+
+.judge-card-header {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-subtle, #1e1e26);
+}
+
+.judge-name {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.judge-persona {
+  font-size: 11px;
+  color: var(--text-hint, #666);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* Dimensions */
+.judge-dimensions {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.judge-dimension {}
+
+.dimension-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.dimension-code {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  flex-shrink: 0;
+}
+
+.dimension-name {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-primary, #f5f5f7);
+  letter-spacing: 0.01em;
+}
+
+.dimension-desc {
+  font-size: 11px;
+  color: var(--text-hint, #666);
+  line-height: 1.55;
+  padding-left: 28px;
+}
+
+/* Footer — full-width strip, clearly below all three columns */
+.judges-footer {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  padding: 20px 32px;
+  border-top: 2px solid var(--border, #2a2a35);
+  background: var(--bg, #0a0a0b);
+  margin-top: 0;
+}
+
+.judges-footer-item {
+  flex: 1;
+  font-size: 11px;
+  color: var(--text-hint, #666);
+  line-height: 1.55;
+}
+
+.judges-footer-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted, #888);
+  margin-bottom: 4px;
+}
+
+.judges-footer-divider {
+  width: 1px;
+  background: var(--border, #2a2a35);
+  align-self: stretch;
+  margin: 0 24px;
+  flex-shrink: 0;
+}

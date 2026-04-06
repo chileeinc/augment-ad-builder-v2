@@ -12,6 +12,11 @@
   overflow: hidden;
 }
 
+/* In dark mode, add a subtle ring so dark-background ads don't dissolve into the page */
+[data-theme="dark"] .variant-ad-wrap {
+  box-shadow: 0 0 0 1px var(--border);
+}
+
 /* 1080×1080 canvas, scaled to fit the display container */
 .variant-canvas {
   position: absolute;
