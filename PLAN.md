@@ -25,14 +25,14 @@
 ## Milestone 1 — Database Foundation
 *Everything else depends on this. Do this first.*
 
-- [ ] Confirm Supabase project credentials are in `.env.local`
-- [ ] Create `sessions` table — `id`, `created_at`, `platform_selection`, `ad_type`
-- [ ] Create `variants` table — `id`, `session_id`, `generation_index`, `variant_data` (full JSON: CSS slots, copy, theme, scores), `created_at`
-- [ ] Create `feedback` table — `id`, `variant_id`, `session_id`, `rating` (1–5), `tags` (array), `note` (text, nullable), `created_at`
-- [ ] Create `reference_rules` table — `id`, `extracted_rules` (text), `image_count`, `updated_at`
-- [ ] Write and run migrations
-- [ ] Add Supabase client to `lib/supabase.ts`
-- [ ] Verify connection works from the app
+- [x] Confirm Supabase project credentials are in `.env.local`
+- [x] Create `sessions` table — `id`, `created_at`, `platform_selection`, `ad_type`
+- [x] Create `variants` table — `id`, `session_id`, `generation_index`, `variant_data` (full JSON: CSS slots, copy, theme, scores), `created_at`
+- [x] Create `feedback` table — `id`, `variant_id`, `session_id`, `rating` (1–5), `tags` (array), `note` (text, nullable), `created_at`
+- [x] Create `reference_rules` table — `id`, `extracted_rules` (text), `image_count`, `updated_at`
+- [x] Write and run migrations
+- [x] Add Supabase client to `lib/supabase.ts`
+- [x] Verify connection works from the app
 
 ---
 
