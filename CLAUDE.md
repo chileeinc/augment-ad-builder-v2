@@ -1,7 +1,10 @@
 # tool-ad-builder-v2
 
+## Source of Truth
+Read `SPEC.md` before doing any work in this project. It defines what this tool is, how it works, all data contracts, and the 9 invariants that must always hold. If something you're about to build contradicts the spec, flag it — don't just build it.
+
 ## Session Continuity
-If `CONTINUE.md` exists in this folder, read it before doing anything else.
+If `HANDOFF.md` exists in this folder, read it before doing anything else.
 
 ## Project
 AI-powered ad builder. User types a prompt → picks platforms → gets 5 AI-generated ad variants → exports as PNG.
